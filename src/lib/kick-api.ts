@@ -1,0 +1,151 @@
+import { getAppAccessToken } from "./auth/kick"
+
+const KICK_API_BASE = "https://api.kick.com/public/v1"
+
+export interface KickSubscription {
+  id: string
+  app_id: string
+  broadcaster_user_id: number
+  event: string
+  method: string
+  version: number
+  created_at: string
+  updated_at: string
+}
+
+export async function getEventsSubscriptions(broadcasterId?: number) {
+  const token = await getAppAccessToken()
+  const url = new URL(`${KICK_API_BASE}/events/subscriptions`)
+  if (broadcasterId) {
+    url.searchParams.append("broadcaster_user_id", broadcasterId.toString())
+  }
+
+  const response = await fetch(url.toString(), {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/json",
+    },
+  })
+
+  if (!response.ok) {
+    const errorBody = await response.text()
+    console.error(`[Kick-API] getEventsSubscriptions failed (${response.status}):`, errorBody)
+    throw new Error(`Failed to get subscriptions: ${response.status} ${errorBody}`)
+  }
+
+  const data = await response.json()
+  return data.data as KickSubscription[]
+}
+
+export async function subscribeToEvents(
+  broadcasterId: number,
+  events: { name: string; version: number }[]
+) {
+  const token = await getAppAccessToken()
+
+  const response = await fetch(`${KICK_API_BASE}/events/subscriptions`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({
+      broadcaster_user_id: broadcasterId,
+      events,
+      method: "webhook",
+    }),
+  })
+
+  if (!response.ok) {
+    const errorBody = await response.text()
+    console.error(`[Kick-API] subscribeToEvents failed (${response.status}):`, errorBody)
+    throw new Error(`Failed to subscribe: ${response.status} ${errorBody}`)
+  }
+
+  return response.json()
+}
+
+export async function deleteEventsSubscriptions(ids: string[]) {
+  const token = await getAppAccessToken()
+  
+  const url = new URL(`${KICK_API_BASE}/events/subscriptions`)
+  ids.forEach(id => url.searchParams.append("id", id))
+
+  const response = await fetch(url.toString(), {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/json",
+    },
+  })
+
+  if (!response.ok && response.status !== 204) {
+    const error = await response.text()
+    throw new Error(`Failed to delete subscriptions: ${error}`)
+  }
+
+  return true
+}
+
+export async function getChannelBySlug(slug: string) {
+  const token = await getAppAccessToken()
+  const response = await fetch(
+    `${KICK_API_BASE}/channels?slug=${slug}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+      },
+    }
+  )
+
+  if (!response.ok) {
+    const error = await response.text()
+    throw new Error(`Failed to get channel: ${error}`)
+  }
+
+  const data = await response.json()
+  return data.data?.[0]
+}
+
+const MAIN_CHANNELS = [8916283] // Twoje ID
+const REQUIRED_EVENTS = [
+  "chat.message.sent",
+  "channel.followed",
+  "channel.subscription.new",
+  "channel.subscription.renewal",
+  "livestream.status.updated"
+]
+
+export async function ensureKickSubscription() {
+  try {
+    for (const broadcasterId of MAIN_CHANNELS) {
+      await subscribeToEvents(
+        broadcasterId,
+        REQUIRED_EVENTS.map(name => ({ name, version: 1 }))
+      )
+    }
+    return true
+  } catch (error) {
+    console.error("[Kick-API] Subscription error:", error)
+    return false
+  }
+}
+
+export async function getKickPublicKey() {
+  const response = await fetch(`${KICK_API_BASE}/public-key`, {
+    headers: {
+      Accept: "application/json",
+    },
+  })
+
+  if (!response.ok) {
+    const errorBody = await response.text()
+    console.error(`[Kick-API] getKickPublicKey failed (${response.status}):`, errorBody)
+    throw new Error(`Failed to get public key: ${response.status} ${errorBody}`)
+  }
+
+  const data = await response.json()
+  return data.data?.public_key as string
+}
