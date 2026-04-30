@@ -28,8 +28,10 @@ export const getPusherClient = (): Pusher => {
   pusherClient = new Pusher(PUSHER_KEY, {
     cluster: PUSHER_CLUSTER,
     forceTLS: true,
-    enabledTransports: ["ws", "wss"],
-    disabledTransports: ["xhr_streaming", "xhr_polling", "sockjs"],
+    // Use Pusher defaults (ws, wss, xhr_streaming, xhr_polling, sockjs).
+    // Restricting to ws/wss broke real-time on networks that block WebSocket
+    // upgrades (some mobile carriers, captive Wi-Fi, corporate proxies) —
+    // HTTP fallbacks are slower but keep the app working there.
     disableStats: true,
   })
 
