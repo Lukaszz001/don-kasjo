@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
 import { connectToDatabase } from "@/lib/db/mongodb"
 import { Prediction } from "@/lib/db/models"
-import { requireModerator } from "@/lib/auth/session"
+import { requireAdmin } from "@/lib/auth/session"
 
 // Mock predictions data for when MongoDB is not configured
 const mockPredictions = [
@@ -107,7 +107,7 @@ const createPredictionSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await requireModerator()
+    const session = await requireAdmin()
     const body = await request.json()
     const data = createPredictionSchema.parse(body)
 

@@ -5,7 +5,6 @@ import { Analytics } from "@vercel/analytics/next"
 import { Toaster } from "sonner"
 import { SidebarNav } from "@/components/layout/sidebar-nav"
 import { LanguageProvider } from "@/lib/language-context"
-import { WatchManager } from "@/components/stream/watch-manager"
 import { getCurrentUser } from "@/lib/auth/session"
 import "./globals.css"
 
@@ -77,7 +76,6 @@ export default async function RootLayout({
         <div className="ambient-glow-2" />
 
         <LanguageProvider initialLanguage={locale}>
-          <WatchManager />
           <div className="relative flex min-h-dvh">
             {/* Decorative background pattern */}
             <div className="pointer-events-none fixed inset-0 doodle-dots" />

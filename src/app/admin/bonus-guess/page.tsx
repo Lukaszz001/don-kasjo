@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { AdminModal } from "@/components/admin/admin-modal"
-import Pusher from "pusher-js"
+import { getPusherClient } from "@/lib/pusher-client"
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
@@ -171,12 +171,14 @@ export default function AdminBonusGuessPage() {
   const active = rounds.find((r) => r.status === "collecting" || r.status === "locked")
 
   useEffect(() => {
-    const pusherKey = process.env.NEXT_PUBLIC_PUSHER_KEY
-    if (!pusherKey) return
-    const pusher = new Pusher(pusherKey, { cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER || "sa1" })
+    const pusher = getPusherClient()
     const ch = pusher.subscribe("platform-updates")
-    ch.bind("bonus-guess-updated", () => mutate())
-    return () => { ch.unbind_all(); pusher.unsubscribe("platform-updates") }
+    const handler = () => mutate()
+    ch.bind("bonus-guess-updated", handler)
+    return () => {
+      // Shared channel — unbind only this handler, do not unsubscribe.
+      ch.unbind("bonus-guess-updated", handler)
+    }
   }, [mutate])
 
   const handleCreate = async () => {

@@ -37,7 +37,6 @@ export async function GET() {
         points: user.points,
         watchTimeMinutes: user.watchTimeMinutes,
         isAdmin: user.isAdmin,
-        isModerator: user.isModerator || false,
         isDeveloper: user.isDeveloper || false,
         stakeUsername: user.stakeUsername,
         isStakeVerified: user.isStakeVerified,
