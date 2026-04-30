@@ -65,27 +65,18 @@ export function SidebarNav({ initialUser }: { initialUser?: any }) {
     { name: t("nav.discord"), href: "/discord", icon: DiscordIcon },
   ]
 
-  const isModerator = user?.isModerator && !user?.isAdmin && !user?.isDeveloper
-
-  const adminNavigation = isModerator
-    ? [
-        { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
-        { name: "Predykcje", href: "/admin/predictions", icon: TrendingUp },
-        { name: "Giveaway", href: "/admin/giveaway", icon: Gift },
-        { name: "Zgadnij Wynik", href: "/admin/bonus-guess", icon: Dices },
-      ]
-    : [
-        { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
-        { name: "Uzytkownicy", href: "/admin/users", icon: UsersIcon },
-        { name: "Predykcje", href: "/admin/predictions", icon: TrendingUp },
-        { name: "Giveaway", href: "/admin/giveaway", icon: Gift },
-        { name: "Zgadnij Wynik", href: "/admin/bonus-guess", icon: Dices },
-        { name: "Sklep", href: "/admin/shop", icon: ShoppingBag },
-        { name: "Instrukcje", href: "/admin/instructions", icon: BookOpen },
-        { name: "Partnerzy", href: "/admin/partners", icon: Handshake },
-        { name: "Logi Zakupów", href: "/admin/purchases", icon: ShoppingBag },
-        ...(user?.isDeveloper ? [{ name: "Ustawienia", href: "/admin/settings", icon: Settings }] : []),
-      ]
+  const adminNavigation = [
+    { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
+    { name: "Uzytkownicy", href: "/admin/users", icon: UsersIcon },
+    { name: "Predykcje", href: "/admin/predictions", icon: TrendingUp },
+    { name: "Giveaway", href: "/admin/giveaway", icon: Gift },
+    { name: "Zgadnij Wynik", href: "/admin/bonus-guess", icon: Dices },
+    { name: "Sklep", href: "/admin/shop", icon: ShoppingBag },
+    { name: "Instrukcje", href: "/admin/instructions", icon: BookOpen },
+    { name: "Partnerzy", href: "/admin/partners", icon: Handshake },
+    { name: "Logi Zakupów", href: "/admin/purchases", icon: ShoppingBag },
+    ...(user?.isDeveloper ? [{ name: "Ustawienia", href: "/admin/settings", icon: Settings }] : []),
+  ]
 
   const navigation = isAdminRoute ? adminNavigation : mainNavigation
 
@@ -224,16 +215,6 @@ export function SidebarNav({ initialUser }: { initialUser?: any }) {
                 <p className="truncate text-sm font-medium text-foreground">
                   {user.kickUsername}
                 </p>
-                {user.isModerator && !user.isAdmin && !user.isDeveloper && (
-                  <span className="inline-block rounded-full bg-blue-500/15 px-2 py-0.5 text-[9px] font-black uppercase tracking-widest text-blue-400 border border-blue-500/20 mt-0.5">
-                    Moderator
-                  </span>
-                )}
-                {(user.isAdmin || user.isDeveloper) && (
-                  <span className="inline-block rounded-full bg-primary/15 px-2 py-0.5 text-[9px] font-black uppercase tracking-widest text-primary border border-primary/20 mt-0.5">
-                    {user.isDeveloper ? "Developer" : "Admin"}
-                  </span>
-                )}
               </div>
             </div>
 
@@ -247,14 +228,14 @@ export function SidebarNav({ initialUser }: { initialUser?: any }) {
                 <User className="h-4 w-4" />
                 {t("nav.profile")}
               </Link>
-              {(user.isAdmin || user.isDeveloper || user.isModerator) && !isAdminRoute && (
+              {(user.isAdmin || user.isDeveloper) && !isAdminRoute && (
                 <Link
                   href="/admin"
                   onClick={() => setMobileOpen(false)}
                   className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
                 >
                   <Crown className="h-4 w-4" />
-                  {user.isModerator && !user.isAdmin && !user.isDeveloper ? "Panel Moderatora" : t("nav.admin")}
+                  {t("nav.admin")}
                 </Link>
               )}
               {isAdminRoute && (

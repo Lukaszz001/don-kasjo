@@ -13,24 +13,29 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json())
  */
 export function useStreamStatus() {
   const { data, mutate, isLoading } = useSWR("/api/kick/stream-status", fetcher, {
-    revalidateOnFocus: false,
+    // Mobile browsers aggressively kill WebSockets in background — when the
+    // tab regains focus or the network reconnects, refetch so the user does
+    // not see stale data while Pusher is reconnecting.
+    revalidateOnFocus: true,
+    revalidateOnReconnect: true,
     revalidateIfStale: false,
-    revalidateOnReconnect: false,
-    dedupingInterval: 300000, // 5 minutes — Pusher handles updates
+    dedupingInterval: 30000,
   })
 
   useEffect(() => {
     const pusher = getPusherClient()
     const channel = pusher.subscribe("platform-updates")
 
-    channel.bind("stream-status-changed", (streamData: any) => {
+    const handler = (streamData: any) => {
       console.log("[Pusher] Stream status changed via WebSocket:", streamData)
-      // Update SWR cache directly with the data from Pusher — no API call needed
       mutate(streamData, false)
-    })
+    }
+
+    channel.bind("stream-status-changed", handler)
 
     return () => {
-      channel.unbind("stream-status-changed")
+      // Unbind only this handler — channel is shared with other hooks.
+      channel.unbind("stream-status-changed", handler)
     }
   }, [mutate])
 

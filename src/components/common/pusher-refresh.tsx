@@ -18,17 +18,22 @@ export function PusherRefresh({ channelName, eventName, onEvent }: PusherRefresh
     const pusher = getPusherClient()
     const channel = pusher.subscribe(channelName)
 
-    channel.bind(eventName, () => {
+    const handler = () => {
       console.log(`[Pusher] Event ${eventName} received on ${channelName}, refreshing...`)
       if (onEvent) {
         onEvent()
       } else {
         router.refresh()
       }
-    })
+    }
+
+    channel.bind(eventName, handler)
 
     return () => {
-      pusher.unsubscribe(channelName)
+      // Unbind only this handler — do NOT unsubscribe the channel,
+      // other components (useStreamStatus, useGlobalStats, sibling PusherRefreshes)
+      // share the same channel and would lose their bindings.
+      channel.unbind(eventName, handler)
     }
   }, [channelName, eventName, router, onEvent])
 

@@ -12,23 +12,25 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json())
  */
 export function useGlobalStats() {
   const { data, mutate, isLoading } = useSWR("/api/stats", fetcher, {
-    revalidateOnFocus: false,
+    revalidateOnFocus: true,
+    revalidateOnReconnect: true,
     revalidateIfStale: false,
-    revalidateOnReconnect: false,
-    dedupingInterval: 30000, // 30s fallback — Pusher handles most updates
+    dedupingInterval: 30000,
   })
 
   useEffect(() => {
     const pusher = getPusherClient()
     const channel = pusher.subscribe("platform-updates")
 
-    channel.bind("stats-updated", (statsData: any) => {
+    const handler = (statsData: any) => {
       console.log("[Pusher] Global stats updated via WebSocket")
       mutate(statsData, false)
-    })
+    }
+
+    channel.bind("stats-updated", handler)
 
     return () => {
-      channel.unbind("stats-updated")
+      channel.unbind("stats-updated", handler)
     }
   }, [mutate])
 
