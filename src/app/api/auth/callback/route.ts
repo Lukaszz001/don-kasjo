@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
     // Get user info from Kick
     const kickUser = await getKickUser(tokens.access_token)
 
-    // Connect to database and find or create user
+    // Connect to database
     await connectToDatabase()
 
     let user = await User.findOne({ kickId: String(kickUser.user_id) })
@@ -48,14 +48,13 @@ export async function GET(request: NextRequest) {
         isAdmin: false,
       })
     } else {
-      // Update user info
       user.kickUsername = kickUser.name
       user.kickAvatar = kickUser.profile_picture || ""
       await user.save()
     }
 
-    // Create session
-    await createSession({
+    // ✅ SESSION FIX (IMPORTANT)
+    const sessionId = await createSession({
       userId: user._id.toString(),
       kickId: user.kickId,
       kickUsername: user.kickUsername,
@@ -65,7 +64,19 @@ export async function GET(request: NextRequest) {
       refreshToken: tokens.refresh_token,
     })
 
-    return NextResponse.redirect(`${appUrl}/`)
+    const res = NextResponse.redirect(`${appUrl}/`)
+
+    res.cookies.set({
+      name: "dk_session",
+      value: sessionId,
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7,
+    })
+
+    return res
   } catch (err) {
     console.error("OAuth callback error:", err)
     return NextResponse.redirect(`${appUrl}/?error=auth_failed`)
