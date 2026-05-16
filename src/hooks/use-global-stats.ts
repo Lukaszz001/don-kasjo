@@ -4,7 +4,10 @@ import { useEffect } from "react"
 import useSWR from "swr"
 import { getPusherClient } from "@/lib/pusher-client"
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json())
+const fetcher = (url: string) =>
+  fetch(url, {
+    credentials: "include",
+  }).then((res) => res.json())
 
 /**
  * Shared hook for global platform stats.
