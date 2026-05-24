@@ -39,13 +39,19 @@ export async function GET() {
       .limit(100)
       .lean()
 
-    const formattedLeaderboard = users.map((user, index) => ({
-      rank: index + 1,
-      kickUsername: user.kickUsername,
-      kickAvatar: user.kickAvatar,
-      points: user.points,
-      watchTimeMinutes: user.watchTimeMinutes,
-    }))
+    const formattedLeaderboard = users
+      .map((user, index) => {
+        if (user.kickUsername === "BotRix") return null;
+
+        return {
+          rank: index + 1,
+          kickUsername: user.kickUsername,
+          kickAvatar: user.kickAvatar,
+          points: user.points,
+          watchTimeMinutes: user.watchTimeMinutes,
+        };
+      })
+      .filter(Boolean);
 
     // 3. Save to Redis for 60 seconds
     await redis.set("leaderboard:top", JSON.stringify(formattedLeaderboard), "EX", 60)
