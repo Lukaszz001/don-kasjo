@@ -1,129 +1,87 @@
-import { connectToDatabase } from "./mongodb"
-import { PartnerSite, Prediction, ShopItem, Instruction, User } from "./models"
+function getBaseUrl() {
+  if (process.env.NEXT_PUBLIC_APP_URL) return process.env.NEXT_PUBLIC_APP_URL
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`
+  return 'http://localhost:3000'
+}
 
 export async function getPartners() {
-  const db = await connectToDatabase()
-  if (!db) {
-    // Return empty array or mock data if db is not connected
+  try {
+    const res = await fetch(`${getBaseUrl()}/api/partners`, { cache: 'no-store' })
+    if (!res.ok) return []
+    const data = await res.json()
+    return data.partners || []
+  } catch (e) {
     return []
   }
-  
-  const partners = await PartnerSite.find({ isActive: true })
-    .sort({ order: 1 })
-    .lean()
-    
-  return partners.map((p) => ({
-    ...p,
-    _id: p._id.toString(),
-  }))
 }
 
 export async function getPredictions(status?: string) {
-  const db = await connectToDatabase()
-  if (!db) {
+  try {
+    const url = new URL(`${getBaseUrl()}/api/predictions`)
+    if (status) url.searchParams.set('status', status)
+    const res = await fetch(url.toString(), { cache: 'no-store' })
+    if (!res.ok) return []
+    const data = await res.json()
+    return data.predictions || []
+  } catch (e) {
     return []
   }
-  
-  const query: Record<string, unknown> = {}
-  if (status) {
-    query.status = status
-  }
-  
-  const predictions = await Prediction.find(query)
-    .sort({ createdAt: -1 })
-    .limit( status === "open" ? 20 : 50)
-    .lean()
-    
-  return predictions.map((p) => ({
-    ...p,
-    _id: p._id.toString(),
-    closesAt: p.closesAt instanceof Date ? p.closesAt.toISOString() : p.closesAt,
-    createdAt: p.createdAt instanceof Date ? p.createdAt.toISOString() : p.createdAt,
-  }))
 }
 
 export async function getShopItems() {
-  const db = await connectToDatabase()
-  if (!db) return []
-  
-  const items = await ShopItem.find({ isActive: true })
-    .sort({ price: 1 })
-    .lean()
-    
-  return items.map((i) => ({
-    ...i,
-    _id: i._id.toString(),
-  }))
+  try {
+    const res = await fetch(`${getBaseUrl()}/api/shop`, { cache: 'no-store' })
+    if (!res.ok) return []
+    const data = await res.json()
+    return data.items || []
+  } catch (e) {
+    return []
+  }
 }
 
 export async function getInstructions() {
-  const db = await connectToDatabase()
-  if (!db) return []
-  
-  const instructions = await Instruction.find({ isPublished: true })
-    .sort({ updatedAt: -1 })
-    .lean()
-    
-  return instructions.map((i) => ({
-    ...i,
-    _id: i._id.toString(),
-    createdAt: i.createdAt instanceof Date ? i.createdAt.toISOString() : i.createdAt,
-    updatedAt: i.updatedAt instanceof Date ? i.updatedAt.toISOString() : i.updatedAt,
-  }))
+  try {
+    const res = await fetch(`${getBaseUrl()}/api/instructions`, { cache: 'no-store' })
+    if (!res.ok) return []
+    const data = await res.json()
+    return data.instructions || []
+  } catch (e) {
+    return []
+  }
 }
 
 export async function getInstructionBySlug(slug: string) {
-  const db = await connectToDatabase()
-  if (!db) return null
-  
-  const instruction = await Instruction.findOne({ slug, isPublished: true }).lean()
-  if (!instruction) return null
-  
-  return {
-    ...instruction,
-    _id: instruction._id.toString(),
-    createdAt: (instruction.createdAt as any) instanceof Date ? (instruction.createdAt as any).toISOString() : instruction.createdAt,
-    updatedAt: (instruction.updatedAt as any) instanceof Date ? (instruction.updatedAt as any).toISOString() : instruction.updatedAt,
+  try {
+    const res = await fetch(`${getBaseUrl()}/api/instructions/${slug}`, { cache: 'no-store' })
+    if (!res.ok) return null
+    const data = await res.json()
+    return data.instruction || null
+  } catch (e) {
+    return null
   }
 }
 
 export async function getLeaderboard() {
-  const db = await connectToDatabase()
-  if (!db) return []
-  
-  // High performance query for top 100 users
-  const users = await User.find({})
-    .sort({ points: -1 })
-    .limit(100)
-    .lean()
-    
-  return users.map((user, index) => {
-    if (user.kickUsername === "BotRix") return null;
-
-    return {
-      rank: index + 1,
-      kickUsername: user.kickUsername,
-      kickAvatar: user.kickAvatar,
-      points: user.points,
-      watchTimeMinutes: user.watchTimeMinutes,
-    };
-  })
-  .filter(Boolean);
+  try {
+    const res = await fetch(`${getBaseUrl()}/api/leaderboard`, { cache: 'no-store' })
+    if (!res.ok) return []
+    const data = await res.json()
+    return data.leaderboard || []
+  } catch (e) {
+    return []
+  }
 }
 
 export async function getGlobalStats() {
-  const db = await connectToDatabase()
-  if (!db) return { totalUsers: 0, pointsInCirculation: 0 }
-  
-  const [totalUsers, pointsData] = await Promise.all([
-    User.countDocuments(),
-    User.aggregate([
-      { $group: { _id: null, totalPoints: { $sum: "$points" } } }
-    ])
-  ])
-
-  return {
-    totalUsers,
-    pointsInCirculation: pointsData[0]?.totalPoints || 0
+  try {
+    const res = await fetch(`${getBaseUrl()}/api/stats`, { cache: 'no-store' })
+    if (!res.ok) return { totalUsers: 0, pointsInCirculation: 0 }
+    const data = await res.json()
+    return {
+      totalUsers: data.totalUsers || 0,
+      pointsInCirculation: data.pointsInCirculation || 0
+    }
+  } catch (e) {
+    return { totalUsers: 0, pointsInCirculation: 0 }
   }
 }
