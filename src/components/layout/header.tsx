@@ -172,7 +172,7 @@ export function Header() {
             </>
           ) : (
             <Button asChild className="group bg-primary hover:bg-primary/90 glow-red">
-              <Link href="/api/auth/kick" className="flex items-center">
+              <a href="/api/auth/kick" className="flex items-center">
                 <Image
                   src="/65897-kick.gif"
                   width={24}
@@ -181,7 +181,7 @@ export function Header() {
                   alt="Kick"
                 />
                 <span className="transition-transform duration-300 group-hover:translate-x-1">{t("hero.cta")}</span>
-              </Link>
+              </a>
             </Button>
           )}
 

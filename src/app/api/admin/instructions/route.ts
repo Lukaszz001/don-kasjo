@@ -2,7 +2,6 @@ import { NextResponse } from "next/server"
 import { connectToDatabase } from "@/lib/db/mongodb"
 import { Instruction } from "@/lib/db/models"
 import { getCurrentSession } from "@/lib/auth/session"
-import { triggerUpdate } from "@/lib/pusher-server"
 
 export async function GET() {
   await connectToDatabase()
@@ -34,7 +33,6 @@ export async function POST(req: Request) {
       isPublished
     })
 
-    await triggerUpdate("platform-updates", "instructions-updated")
     return NextResponse.json({ instruction })
   } catch (error: any) {
     if (error.code === 11000) {
@@ -59,7 +57,6 @@ export async function PUT(req: Request) {
     return NextResponse.json({ error: "Instruction not found" }, { status: 404 })
   }
 
-  await triggerUpdate("platform-updates", "instructions-updated")
   return NextResponse.json({ instruction })
 }
 
@@ -79,6 +76,5 @@ export async function DELETE(req: Request) {
   await connectToDatabase()
   await Instruction.findByIdAndDelete(id)
 
-  await triggerUpdate("platform-updates", "instructions-updated")
   return NextResponse.json({ success: true })
 }

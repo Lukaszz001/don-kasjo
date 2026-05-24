@@ -4,7 +4,6 @@ import Link from "next/link"
 import { BookOpen, ArrowRight, Sparkles, Zap, Trophy, HelpCircle } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { useLanguage } from "@/lib/language-context"
-import { PusherRefresh } from "@/components/common/pusher-refresh"
 import useSWR from "swr"
 import { cn } from "@/lib/utils"
 
@@ -14,7 +13,7 @@ const DEFAULT_ICONS = [BookOpen, Zap, Trophy, Sparkles, HelpCircle]
 
 export function InstructionsPreview() {
   const { t } = useLanguage()
-  const { data, isLoading } = useSWR("/api/instructions", fetcher)
+  const { data, isLoading } = useSWR("/api/instructions", fetcher, { refreshInterval: 60000 })
 
   const instructions = data?.instructions?.slice(0, 3) || []
 
@@ -39,8 +38,6 @@ export function InstructionsPreview() {
 
   return (
     <div className="grid gap-6 md:grid-cols-3">
-      <PusherRefresh channelName="platform-updates" eventName="instructions-updated" />
-      
       {instructions.map((instruction: any, index: number) => {
         const Icon = DEFAULT_ICONS[index % DEFAULT_ICONS.length]
         return (

@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { useLanguage } from "@/lib/language-context"
-import { PusherRefresh } from "@/components/common/pusher-refresh"
+import { useRouter } from "next/navigation"
 import useSWR from "swr"
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
@@ -37,6 +37,14 @@ export function LeaderboardContent({ initialLeaderboard }: { initialLeaderboard:
   const { t } = useLanguage()
   const { data: userData } = useSWR("/api/auth/me", fetcher)
   const user = userData?.user
+  const router = useRouter()
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      router.refresh()
+    }, 60000)
+    return () => clearInterval(interval)
+  }, [router])
 
   // Pre-sort rankings
   const pointsRanking = [...initialLeaderboard]
@@ -63,7 +71,6 @@ export function LeaderboardContent({ initialLeaderboard }: { initialLeaderboard:
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 lg:px-8">
-      <PusherRefresh channelName="platform-updates" eventName="leaderboard-updated" />
       
       {/* Header Section */}
       <div className="mb-12 text-center">

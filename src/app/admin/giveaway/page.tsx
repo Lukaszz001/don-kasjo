@@ -10,7 +10,6 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { AdminModal } from "@/components/admin/admin-modal"
-import { getPusherClient } from "@/lib/pusher-client"
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
@@ -275,7 +274,9 @@ function DrawModal({ giveaway, onClose, onDrawn }: { giveaway: Giveaway; onClose
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function AdminGiveawayPage() {
-  const { data, mutate } = useSWR<{ giveaways: Giveaway[] }>("/api/admin/giveaway", fetcher)
+  const { data, mutate } = useSWR<{ giveaways: Giveaway[] }>("/api/admin/giveaway", fetcher, {
+    refreshInterval: 5000
+  })
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [drawTargetId, setDrawTargetId] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -286,53 +287,6 @@ export default function AdminGiveawayPage() {
   const active = giveaways.find((g) => g.status === "collecting")
   // Derive drawTarget from SWR data so it always has the latest participants
   const drawTarget = drawTargetId ? giveaways.find((g) => g._id === drawTargetId) || null : null
-
-  // ── Real-time Pusher updates (optimistic cache) ────────────────────────────
-  useEffect(() => {
-    const pusher = getPusherClient()
-    const ch = pusher.subscribe("platform-updates")
-
-    ch.bind("giveaway-updated", (payload: {
-      id: string
-      status: string
-      participantCount: number
-      newParticipant?: Participant
-      winner?: { kickId: string; username: string }
-    }) => {
-      // If it's just a new participant, update the cache optimistically
-      if (payload.newParticipant && payload.status === "collecting") {
-        mutate((prev: { giveaways: Giveaway[] } | undefined) => {
-          if (!prev) return prev
-          return {
-            giveaways: prev.giveaways.map((g) => {
-              if (g._id !== payload.id) return g
-              // Avoid duplicates
-              const alreadyExists = g.participants.some(
-                (p) => p.kickId === payload.newParticipant!.kickId
-              )
-              if (alreadyExists) return g
-              return {
-                ...g,
-                participantCount: payload.participantCount,
-                participants: [
-                  ...g.participants,
-                  payload.newParticipant!,
-                ],
-              }
-            }),
-          }
-        }, { revalidate: false })
-      } else {
-        // For status changes (stop, draw, reset) — full re-fetch
-        mutate()
-      }
-    })
-
-    return () => {
-      ch.unbind("giveaway-updated")
-      pusher.unsubscribe("platform-updates")
-    }
-  }, [mutate])
 
   const handleCreate = async () => {
     if (!phrase.trim()) { toast.error("Wpisz frazę"); return }

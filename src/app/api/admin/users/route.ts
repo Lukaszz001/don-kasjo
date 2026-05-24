@@ -10,7 +10,6 @@ export async function GET() {
 
     const users = await User.find({})
       .sort({ createdAt: -1 })
-      .limit(200)
       .lean()
 
     return NextResponse.json({

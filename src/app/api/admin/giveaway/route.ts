@@ -2,8 +2,7 @@ import { NextResponse } from "next/server"
 import { connectToDatabase } from "@/lib/db/mongodb"
 import { Giveaway } from "@/lib/db/models"
 import { redis } from "@/lib/db/redis"
-import { requireModerator } from "@/lib/auth/session"
-import { triggerUpdate } from "@/lib/pusher-server"
+import { requireAdmin } from "@/lib/auth/session"
 import { z } from "zod"
 
 const createSchema = z.object({
@@ -12,7 +11,7 @@ const createSchema = z.object({
 
 export async function GET() {
   try {
-    await requireModerator()
+    await requireAdmin()
     await connectToDatabase()
 
     const giveaways = await Giveaway.find({})
@@ -38,7 +37,7 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
-    const session = await requireModerator()
+    const session = await requireAdmin()
     const body = await req.json()
     const parsed = createSchema.safeParse(body)
     if (!parsed.success) return NextResponse.json({ error: "Nieprawidłowe dane" }, { status: 400 })
@@ -59,11 +58,6 @@ export async function POST(req: Request) {
       JSON.stringify({ id: giveaway._id.toString(), phrase: parsed.data.phrase })
     )
 
-    await triggerUpdate("platform-updates", "giveaway-updated", {
-      id: giveaway._id.toString(),
-      status: "collecting",
-      participantCount: 0,
-    })
 
     return NextResponse.json({ giveaway: { ...giveaway.toObject(), _id: giveaway._id.toString() } })
   } catch (error) {

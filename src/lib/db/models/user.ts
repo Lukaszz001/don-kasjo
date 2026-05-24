@@ -8,7 +8,6 @@ export interface IUser extends Document {
   points: number
   watchTimeMinutes: number
   isAdmin: boolean
-  isModerator: boolean
   isDeveloper: boolean
   stakeUsername?: string
   isStakeVerified: boolean
@@ -26,7 +25,6 @@ const userSchema = new Schema<IUser>(
     points: { type: Number, default: 0, min: 0 },
     watchTimeMinutes: { type: Number, default: 0, min: 0 },
     isAdmin: { type: Boolean, default: false },
-    isModerator: { type: Boolean, default: false },
     isDeveloper: { type: Boolean, default: false },
     stakeUsername: { type: String, default: "" },
     isStakeVerified: { type: Boolean, default: false },

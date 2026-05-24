@@ -3,7 +3,6 @@ import crypto from "crypto"
 import { connectToDatabase } from "@/lib/db/mongodb"
 import { User, ChatLog, Giveaway, BonusGuess, BonusGuessEntry, Activity } from "@/lib/db/models"
 import { redis } from "@/lib/db/redis"
-import { triggerUpdate } from "@/lib/pusher-server"
 
 import { getKickPublicKey } from "@/lib/kick-api"
 
@@ -45,19 +44,21 @@ export async function POST(req: Request) {
     const rawBody = await req.text()
 
     const eventType = req.headers.get("Kick-Event-Type")
+    const messageId = req.headers.get("Kick-Event-Message-Id")
+
+    console.log(`[WEBHOOK] hit type=${eventType} msg=${messageId}`)
 
     // Validate signature
     const isValid = await verifySignature(req, rawBody)
 
     if (!isValid) {
+      console.warn(`[WEBHOOK] invalid signature (env=${process.env.NODE_ENV})`)
       if (process.env.NODE_ENV === "production") {
         return NextResponse.json({ error: "Invalid signature" }, { status: 401 })
       }
     }
 
     const payload = JSON.parse(rawBody)
-
-    const subscriptionId = req.headers.get("Kick-Event-Subscription-Id") || undefined
 
     await connectToDatabase()
 
@@ -132,7 +133,6 @@ export async function POST(req: Request) {
             if (!statsDebounce) {
               await redis.set("stats:push-debounce", "1", "EX", 10)
               await redis.del("stats:global")
-              await triggerUpdate("platform-updates", "stats-updated")
             }
           }
         } else {
@@ -165,13 +165,6 @@ export async function POST(req: Request) {
                     type: "giveaway_entry",
                     title: "Udział w konkursie",
                     description: `Dołączono do konkursu: "${phrase}"`,
-                  })
-
-                  await triggerUpdate("platform-updates", "giveaway-updated", {
-                    id: giveawayId,
-                    status: updated.status,
-                    participantCount: updated.participants.length,
-                    newParticipant: { kickId, username, enteredAt: new Date().toISOString() },
                   })
                 }
               }
@@ -209,12 +202,6 @@ export async function POST(req: Request) {
                     title: "Typowanie bonusu",
                     description: `Wytypowano kwotę ${parsed} ${JSON.parse(activeBonusRaw).currency || "USD"}`,
                   })
-
-                  await triggerUpdate("platform-updates", "bonus-guess-updated", {
-                    id: guessId,
-                    status: "collecting",
-                    newEntry: { username, guess: parsed },
-                  })
                 }
               }
             }
@@ -227,22 +214,27 @@ export async function POST(req: Request) {
       }
 
       case "channel.followed": {
+        const follower = payload.follower
+        if (follower?.user_id) {
+          console.log(`[WEBHOOK] new follower: ${follower.username} (${follower.user_id})`)
+        }
         break
       }
 
       case "livestream.status.updated": {
+        // Kick payload: { broadcaster, is_live, title, started_at, ended_at }
         const streamData = {
           isLive: !!payload.is_live,
           title: payload.title || "",
-          viewers: payload.viewer_count || 0,
           startedAt: payload.started_at || null,
+          endedAt: payload.ended_at || null,
         }
         await redis.set("kick:stream-status", JSON.stringify(streamData), "EX", 300)
-        await triggerUpdate("platform-updates", "stream-status-changed", streamData)
         break
       }
 
       default:
+        console.log(`[WEBHOOK] unhandled event type: ${eventType}`)
         break
     }
 

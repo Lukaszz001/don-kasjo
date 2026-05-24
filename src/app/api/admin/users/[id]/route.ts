@@ -7,7 +7,6 @@ import { requireAdmin } from "@/lib/auth/session"
 
 const updateUserSchema = z.object({
   isAdmin: z.boolean().optional(),
-  isModerator: z.boolean().optional(),
   pointsToAdd: z.number().int().optional(),
   points: z.number().int().min(0).optional(),
 })
@@ -35,10 +34,6 @@ export async function PATCH(
 
     if (data.isAdmin !== undefined) {
       user.isAdmin = data.isAdmin
-    }
-
-    if (data.isModerator !== undefined) {
-      user.isModerator = data.isModerator
     }
 
     if (data.pointsToAdd !== undefined) {

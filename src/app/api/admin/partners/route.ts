@@ -2,7 +2,6 @@ import { NextResponse } from "next/server"
 import { connectToDatabase } from "@/lib/db/mongodb"
 import { PartnerSite } from "@/lib/db/models"
 import { getCurrentSession } from "@/lib/auth/session"
-import { triggerUpdate } from "@/lib/pusher-server"
 
 export async function GET() {
   await connectToDatabase()
@@ -38,7 +37,6 @@ export async function POST(req: Request) {
       htmlContent: htmlContent || ""
     })
 
-    await triggerUpdate("platform-updates", "partners-updated")
     return NextResponse.json({ partner })
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 })
@@ -60,7 +58,6 @@ export async function PUT(req: Request) {
     return NextResponse.json({ error: "Partner not found" }, { status: 404 })
   }
 
-  await triggerUpdate("platform-updates", "partners-updated")
   return NextResponse.json({ partner })
 }
 
@@ -80,6 +77,5 @@ export async function DELETE(req: Request) {
   await connectToDatabase()
   await PartnerSite.findByIdAndDelete(id)
 
-  await triggerUpdate("platform-updates", "partners-updated")
   return NextResponse.json({ success: true })
 }

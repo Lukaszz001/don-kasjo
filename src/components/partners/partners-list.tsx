@@ -8,7 +8,8 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { useLanguage } from "@/lib/language-context"
-import { PusherRefresh } from "@/components/common/pusher-refresh"
+import { useRouter } from "next/navigation"
+import { useEffect } from "react"
 
 interface Partner {
   _id: string
@@ -25,10 +26,17 @@ interface Partner {
 export function PartnersList({ initialPartners }: { initialPartners: any[] }) {
   const { t } = useLanguage()
   const partners = initialPartners
+  const router = useRouter()
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      router.refresh()
+    }, 60000)
+    return () => clearInterval(interval)
+  }, [router])
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-12 lg:px-12 space-y-12">
-      <PusherRefresh channelName="platform-updates" eventName="partners-updated" />
       <div className="text-center lg:text-left space-y-4">
         <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-[10px] font-black text-primary tracking-[0.2em] animate-pulse-glow uppercase">
           <Gift className="h-4 w-4" />

@@ -23,7 +23,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { PredictionBetDialog } from "@/components/predictions/bet-dialog"
 import { isPast, differenceInSeconds } from "date-fns"
 import { useLanguage } from "@/lib/language-context"
-import { PusherRefresh } from "@/components/common/pusher-refresh"
 import { cn } from "@/lib/utils"
 import useSWR from "swr"
 
@@ -53,10 +52,13 @@ export function PredictionsContent({ initialPredictions }: { initialPredictions:
   const { t } = useLanguage()
   const { data: response, mutate: mutatePredictions } = useSWR<{ predictions: Prediction[] }>("/api/predictions", fetcher, { 
     fallbackData: { predictions: initialPredictions },
-    revalidateOnFocus: false 
+    revalidateOnFocus: false,
+    refreshInterval: 10000
   })
   
-  const { data: userData, mutate: mutateUser } = useSWR("/api/auth/me", fetcher)
+  const { data: userData, mutate: mutateUser } = useSWR("/api/auth/me", fetcher, {
+    refreshInterval: 10000
+  })
   const [selectedPrediction, setSelectedPrediction] = useState<Prediction | null>(null)
 
   const user = userData?.user
@@ -79,11 +81,6 @@ export function PredictionsContent({ initialPredictions }: { initialPredictions:
 
   return (
     <div className="relative min-h-screen px-4 py-12 lg:px-8">
-      <PusherRefresh 
-        channelName="platform-updates" 
-        eventName="predictions-updated" 
-        onEvent={handleRefresh}
-      />
       
       {/* Ambient background glows */}
       <div className="absolute top-0 left-0 -z-10 h-[500px] w-[500px] bg-primary/5 blur-[120px]" />

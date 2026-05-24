@@ -6,7 +6,9 @@ import { BookOpen, ArrowRight } from "lucide-react"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useLanguage } from "@/lib/language-context"
-import { PusherRefresh } from "@/components/common/pusher-refresh"
+import useSWR from "swr"
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
 interface Instruction {
   _id: string
@@ -18,12 +20,14 @@ interface Instruction {
 
 export function InstructionsList({ initialInstructions }: { initialInstructions: any[] }) {
   const { t } = useLanguage()
-  const instructions = initialInstructions
+  const { data } = useSWR("/api/instructions", fetcher, { 
+    fallbackData: { instructions: initialInstructions },
+    refreshInterval: 60000 
+  })
+  const instructions = data?.instructions || initialInstructions
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 lg:px-8 relative">
-      <PusherRefresh channelName="platform-updates" eventName="instructions-updated" />
-      
       {/* Ambient background glows */}
       <div className="absolute top-0 left-0 -z-10 h-[500px] w-[500px] bg-primary/5 blur-[120px]" />
       <div className="absolute bottom-0 right-0 -z-10 h-[500px] w-[500px] bg-accent/5 blur-[120px]" />

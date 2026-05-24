@@ -4,7 +4,6 @@ import mongoose from "mongoose"
 import { connectToDatabase } from "@/lib/db/mongodb"
 import { ShopItem } from "@/lib/db/models"
 import { requireAdmin } from "@/lib/auth/session"
-import { triggerUpdate } from "@/lib/pusher-server"
 
 const updateItemSchema = z.object({
   name: z.string().min(1).max(200).optional(),
@@ -35,8 +34,6 @@ export async function PATCH(
     if (!item) {
       return NextResponse.json({ error: "Item not found" }, { status: 404 })
     }
-
-    await triggerUpdate("platform-updates", "shop-updated")
 
     return NextResponse.json({
       item: {
@@ -85,8 +82,6 @@ export async function DELETE(
     if (!item) {
       return NextResponse.json({ error: "Item not found" }, { status: 404 })
     }
-
-    await triggerUpdate("platform-updates", "shop-updated")
 
     return NextResponse.json({ success: true })
   } catch (error) {

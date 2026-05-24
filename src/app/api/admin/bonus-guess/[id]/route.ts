@@ -2,8 +2,7 @@ import { NextResponse } from "next/server"
 import { connectToDatabase } from "@/lib/db/mongodb"
 import { BonusGuess, BonusGuessEntry } from "@/lib/db/models"
 import { redis } from "@/lib/db/redis"
-import { requireModerator } from "@/lib/auth/session"
-import { triggerUpdate } from "@/lib/pusher-server"
+import { requireAdmin } from "@/lib/auth/session"
 import { z } from "zod"
 
 const updateSchema = z.discriminatedUnion("action", [
@@ -16,7 +15,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await requireModerator()
+    await requireAdmin()
     const { id } = await params
     await connectToDatabase()
 
@@ -51,7 +50,7 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await requireModerator()
+    const session = await requireAdmin()
     const { id } = await params
     const body = await req.json()
     const parsed = updateSchema.safeParse(body)
@@ -67,10 +66,6 @@ export async function PATCH(
       await redis.del("bonus-guess:active")
       await round.save()
 
-      await triggerUpdate("platform-updates", "bonus-guess-updated", {
-        id: round._id.toString(),
-        status: "locked",
-      })
     }
 
     if (parsed.data.action === "resolve") {
@@ -107,18 +102,6 @@ export async function PATCH(
       await redis.del("bonus-guess:active")
       await round.save()
 
-      await triggerUpdate("platform-updates", "bonus-guess-updated", {
-        id: round._id.toString(),
-        status: "resolved",
-        result,
-        winner: round.winnerUsername
-          ? {
-              username: round.winnerUsername,
-              guess: round.winnerGuess,
-              difference: round.winnerDifference,
-            }
-          : null,
-      })
     }
 
     return NextResponse.json({ round: { ...round.toObject(), _id: round._id.toString() } })
@@ -136,7 +119,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await requireModerator()
+    await requireAdmin()
     const { id } = await params
     await connectToDatabase()
 
@@ -156,10 +139,6 @@ export async function DELETE(
     await BonusGuessEntry.deleteMany({ guessId: id })
     await redis.del(`bonus-guess:${id}:guessed`)
 
-    await triggerUpdate("platform-updates", "bonus-guess-updated", {
-      id,
-      action: "deleted"
-    })
 
     return NextResponse.json({ success: true })
   } catch (error) {

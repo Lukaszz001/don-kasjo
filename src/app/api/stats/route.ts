@@ -8,6 +8,8 @@ import { getConfig, CONFIG_KEYS } from "@/lib/config"
 
 const DEFAULT_KICK_CHANNEL = process.env.NEXT_PUBLIC_KICK_CHANNEL_ID || process.env.KICK_CHANNEL_ID || "donkasjo"
 
+export const dynamic = "force-dynamic"
+
 export async function GET() {
   try {
     const user = await getCurrentUser()
@@ -19,7 +21,11 @@ export async function GET() {
     const cacheKey = isDev ? `stats:global:dev:${user?._id}` : "stats:global"
     const cachedStats = await redis.get(cacheKey)
     if (cachedStats) {
-      return NextResponse.json(JSON.parse(cachedStats))
+      return NextResponse.json(JSON.parse(cachedStats), {
+        headers: {
+          "Cache-Control": "no-store, max-age=0, must-revalidate",
+        },
+      })
     }
 
     await connectToDatabase()
@@ -69,13 +75,22 @@ export async function GET() {
     // 4. Save to Redis cache for 60 seconds
     await redis.set(cacheKey, JSON.stringify(stats), "EX", 15)
 
-    return NextResponse.json(stats)
+    return NextResponse.json(stats, {
+      headers: {
+        "Cache-Control": "no-store, max-age=0, must-revalidate",
+      },
+    })
   } catch (error) {
     console.error("Failed to fetch global stats:", error)
     return NextResponse.json({
       pointsInCirculation: 0,
       totalUsers: 0,
       kickSubscribers: 0
-    }, { status: 500 })
+    }, { 
+      status: 500,
+      headers: {
+        "Cache-Control": "no-store, max-age=0, must-revalidate",
+      },
+    })
   }
 }

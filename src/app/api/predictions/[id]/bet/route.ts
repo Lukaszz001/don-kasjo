@@ -4,7 +4,6 @@ import mongoose from "mongoose"
 import { connectToDatabase } from "@/lib/db/mongodb"
 import { Prediction, User, UserBet, Activity } from "@/lib/db/models"
 import { requireAuth } from "@/lib/auth/session"
-import { triggerUpdate } from "@/lib/pusher-server"
 import { rateLimit } from "@/lib/db/redis"
 
 const betSchema = z.object({
@@ -101,8 +100,6 @@ export async function POST(
         }
       ])
 
-      // Trigger real-time update
-      await triggerUpdate("platform-updates", "predictions-updated")
 
       return NextResponse.json({
         bet: {

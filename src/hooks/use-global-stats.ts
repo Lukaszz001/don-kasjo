@@ -1,36 +1,19 @@
 "use client"
 
-import { useEffect } from "react"
 import useSWR from "swr"
-import { getPusherClient } from "@/lib/pusher-client"
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
 /**
  * Shared hook for global platform stats.
- * Fetches once from API, then updates via Pusher WebSocket.
+ * Fetches from API and polls every 15 seconds.
  */
 export function useGlobalStats() {
-  const { data, mutate, isLoading } = useSWR("/api/stats", fetcher, {
+  const { data, isLoading } = useSWR("/api/stats", fetcher, {
     revalidateOnFocus: false,
-    revalidateIfStale: false,
     revalidateOnReconnect: false,
-    dedupingInterval: 30000, // 30s fallback — Pusher handles most updates
+    refreshInterval: 15000,
   })
-
-  useEffect(() => {
-    const pusher = getPusherClient()
-    const channel = pusher.subscribe("platform-updates")
-
-    channel.bind("stats-updated", (statsData: any) => {
-      console.log("[Pusher] Global stats updated via WebSocket")
-      mutate(statsData, false)
-    })
-
-    return () => {
-      channel.unbind("stats-updated")
-    }
-  }, [mutate])
 
   return {
     pointsInCirculation: data?.pointsInCirculation ?? 0,

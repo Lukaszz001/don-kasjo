@@ -13,7 +13,6 @@ export interface SessionData {
   kickUsername: string
   kickAvatar: string
   isAdmin: boolean
-  isModerator: boolean
   accessToken: string
   refreshToken: string
 }
@@ -26,7 +25,7 @@ export async function createSession(data: SessionData): Promise<string> {
   cookieStore.set(SESSION_COOKIE_NAME, sessionId, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     maxAge: SESSION_EXPIRY,
     path: "/",
   })
@@ -66,14 +65,6 @@ export async function requireAuth(): Promise<SessionData> {
 export async function requireAdmin(): Promise<SessionData> {
   const session = await requireAuth()
   if (!session.isAdmin) {
-    throw new Error("Forbidden")
-  }
-  return session
-}
-
-export async function requireModerator(): Promise<SessionData> {
-  const session = await requireAuth()
-  if (!session.isAdmin && !session.isModerator) {
     throw new Error("Forbidden")
   }
   return session

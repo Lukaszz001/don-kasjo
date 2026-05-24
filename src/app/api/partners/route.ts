@@ -3,7 +3,6 @@ import { z } from "zod"
 import { connectToDatabase } from "@/lib/db/mongodb"
 import { PartnerSite } from "@/lib/db/models"
 import { requireAdmin } from "@/lib/auth/session"
-import { triggerUpdate } from "@/lib/pusher-server"
 
 // Mock partners data for when MongoDB is not configured
 const mockPartners = [
@@ -101,8 +100,6 @@ export async function POST(request: NextRequest) {
       isActive: true,
     })
 
-    // Trigger real-time update
-    await triggerUpdate("platform-updates", "partners-updated")
 
     return NextResponse.json({
       partner: {

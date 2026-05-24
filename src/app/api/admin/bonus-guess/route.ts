@@ -2,8 +2,7 @@ import { NextResponse } from "next/server"
 import { connectToDatabase } from "@/lib/db/mongodb"
 import { BonusGuess } from "@/lib/db/models"
 import { redis } from "@/lib/db/redis"
-import { requireModerator } from "@/lib/auth/session"
-import { triggerUpdate } from "@/lib/pusher-server"
+import { requireAdmin } from "@/lib/auth/session"
 import { z } from "zod"
 
 const createSchema = z.object({
@@ -13,7 +12,7 @@ const createSchema = z.object({
 
 export async function GET() {
   try {
-    await requireModerator()
+    await requireAdmin()
     await connectToDatabase()
 
     const rounds = await BonusGuess.find({}).sort({ createdAt: -1 }).limit(20).lean()
@@ -32,9 +31,8 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
-    const session = await requireModerator()
+    const session = await requireAdmin()
     const body = await req.json()
-
     const parsed = createSchema.safeParse(body)
     if (!parsed.success) return NextResponse.json({ error: "Nieprawidłowe dane" }, { status: 400 })
 
@@ -52,12 +50,6 @@ export async function POST(req: Request) {
       JSON.stringify({ id: round._id.toString(), status: "collecting", currency: parsed.data.currency })
     )
 
-    await triggerUpdate("platform-updates", "bonus-guess-updated", {
-      id: round._id.toString(),
-      status: "collecting",
-      slotName: parsed.data.slotName,
-      currency: parsed.data.currency,
-    })
 
     return NextResponse.json({ round: { ...round.toObject(), _id: round._id.toString() } })
   } catch (error) {

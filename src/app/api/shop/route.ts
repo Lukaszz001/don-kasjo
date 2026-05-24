@@ -3,7 +3,6 @@ import { z } from "zod"
 import { connectToDatabase } from "@/lib/db/mongodb"
 import { ShopItem } from "@/lib/db/models"
 import { requireAdmin } from "@/lib/auth/session"
-import { triggerUpdate } from "@/lib/pusher-server"
 
 // Mock shop items for when MongoDB is not configured
 const mockShopItems = [
@@ -99,8 +98,6 @@ export async function POST(request: NextRequest) {
       stock: data.stock ?? null,
       isActive: true,
     })
-
-    await triggerUpdate("platform-updates", "shop-updated")
 
     return NextResponse.json({
       item: {

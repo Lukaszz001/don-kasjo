@@ -233,7 +233,7 @@ export default function HomePage() {
               size="lg"
               className="group h-12 bg-primary px-8 font-display font-bold hover:bg-primary/90 glow-green"
             >
-              <Link href="/api/auth/kick" className="flex items-center">
+              <a href="/api/auth/kick" className="flex items-center">
                 <Image
                   src="/65897-kick.gif"
                   width={32}
@@ -242,7 +242,7 @@ export default function HomePage() {
                   alt="Kick"
                 />
                 <span className="transition-transform duration-300 group-hover:translate-x-1">{t("hero.cta")}</span>
-              </Link>
+              </a>
             </Button>
             <a
               href={`https://kick.com/${process.env.NEXT_PUBLIC_KICK_CHANNEL_ID || "donkasjo"}`}
@@ -434,7 +434,7 @@ export default function HomePage() {
                 size="lg"
                 className="h-16 rounded-2xl bg-primary px-10 text-black font-black italic uppercase tracking-widest text-sm glow-green transition-all transform hover:scale-105 active:scale-95 group/kick"
               >
-                <Link href="/api/auth/kick" className="flex items-center">
+                <a href="/api/auth/kick" className="flex items-center">
                   <Image
                     src="/65897-kick.gif"
                     width={32}
@@ -443,7 +443,7 @@ export default function HomePage() {
                     alt="Kick"
                   />
                   {t("hero.cta")}
-                </Link>
+                </a>
               </Button>
               <Button
                 asChild

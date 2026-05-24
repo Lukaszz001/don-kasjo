@@ -4,6 +4,18 @@ import { connectToDatabase } from "@/lib/db/mongodb"
 import { ShopItem, User, Purchase, Activity } from "@/lib/db/models"
 import { requireAuth } from "@/lib/auth/session"
 
+/**
+ * Purchase a shop item.
+ *
+ * Implementation note: we deliberately avoid `mongoose.startSession()` /
+ * `withTransaction(...)` here, because multi-document transactions in MongoDB
+ * require a replica set. On a standalone deployment (typical for local dev)
+ * the whole transaction throws and the route fails silently with a 500,
+ * which previously caused points not to be deducted AND no purchase/activity
+ * log to be written.
+ *
+ * Instead we use conditional atomic updates and compensate on failure.
+ */
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -13,108 +25,118 @@ export async function POST(
     const { id } = await params
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return NextResponse.json(
-        { error: "Invalid item ID" },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: "Invalid item ID" }, { status: 400 })
     }
 
     await connectToDatabase()
 
-    const mongoSession = await mongoose.startSession()
-
-    try {
-      let result: { purchase: unknown; newBalance: number } | null = null
-
-      await mongoSession.withTransaction(async () => {
-        // Get shop item
-        const item = await ShopItem.findById(id).session(mongoSession)
-        if (!item) {
-          throw new Error("Item not found")
-        }
-
-        if (!item.isActive) {
-          throw new Error("Item is not available")
-        }
-
-        if (item.stock !== null && item.stock <= 0) {
-          throw new Error("Item is out of stock")
-        }
-
-        // Get user
-        const user = await User.findById(session.userId).session(mongoSession)
-        if (!user) {
-          throw new Error("User not found")
-        }
-
-        if (user.points < item.price) {
-          throw new Error("Insufficient points")
-        }
-
-        // Deduct points
-        user.points -= item.price
-        await user.save({ session: mongoSession })
-
-        // Reduce stock if applicable
-        if (item.stock !== null) {
-          item.stock -= 1
-          await item.save({ session: mongoSession })
-        }
-
-        // Create purchase record
-        const purchase = await Purchase.create(
-          [
-            {
-              userId: session.userId,
-              itemId: id,
-              itemName: item.name,
-              pointsSpent: item.price,
-              status: "pending",
-            },
-          ],
-          { session: mongoSession }
-        )
-
-        // Record activity
-        await Activity.create([
-          {
-            kickId: user.kickId,
-            type: "shop_purchase",
-            title: "Zakup w sklepie",
-            description: `Zakupiono przedmiot: "${item.name}" za ${item.price} pkt`,
-            pointsChange: -item.price,
-          }
-        ], { session: mongoSession })
-
-        result = {
-          purchase: {
-            ...purchase[0].toObject(),
-            _id: purchase[0]._id.toString(),
-          },
-          newBalance: user.points,
-        }
-      })
-
-      return NextResponse.json(result)
-    } finally {
-      mongoSession.endSession()
+    // 1. Load item up front so we know the price and can validate availability.
+    const item = await ShopItem.findById(id)
+    if (!item) {
+      return NextResponse.json({ error: "Item not found" }, { status: 400 })
     }
+    if (!item.isActive) {
+      return NextResponse.json(
+        { error: "Item is not available" },
+        { status: 400 }
+      )
+    }
+    if (item.stock !== null && item.stock <= 0) {
+      return NextResponse.json(
+        { error: "Item is out of stock" },
+        { status: 400 }
+      )
+    }
+
+    const price = item.price
+
+    // 2. Atomically decrement user's points only if they have enough.
+    //    This prevents race conditions and double-spending.
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: session.userId, points: { $gte: price } },
+      { $inc: { points: -price } },
+      { new: true }
+    )
+
+    if (!updatedUser) {
+      // Either user doesn't exist or doesn't have enough points.
+      const exists = await User.exists({ _id: session.userId })
+      if (!exists) {
+        return NextResponse.json({ error: "User not found" }, { status: 400 })
+      }
+      return NextResponse.json(
+        { error: "Insufficient points" },
+        { status: 400 }
+      )
+    }
+
+    // 3. If the item has limited stock, atomically decrement it.
+    //    On failure, refund the user's points (compensation).
+    if (item.stock !== null) {
+      const updatedItem = await ShopItem.findOneAndUpdate(
+        { _id: id, isActive: true, stock: { $gt: 0 } },
+        { $inc: { stock: -1 } },
+        { new: true }
+      )
+
+      if (!updatedItem) {
+        // Race lost - someone bought the last unit. Refund.
+        await User.updateOne(
+          { _id: session.userId },
+          { $inc: { points: price } }
+        )
+        return NextResponse.json(
+          { error: "Item is out of stock" },
+          { status: 400 }
+        )
+      }
+    }
+
+    // 4. Create the purchase record. If this fails, refund + restore stock.
+    let purchaseDoc
+    try {
+      purchaseDoc = await Purchase.create({
+        userId: session.userId,
+        itemId: id,
+        itemName: item.name,
+        pointsSpent: price,
+        status: "pending",
+      })
+    } catch (err) {
+      await User.updateOne(
+        { _id: session.userId },
+        { $inc: { points: price } }
+      )
+      if (item.stock !== null) {
+        await ShopItem.updateOne({ _id: id }, { $inc: { stock: 1 } })
+      }
+      throw err
+    }
+
+    // 5. Best-effort activity log. Don't roll back the purchase if this fails
+    //    - the purchase itself is the source of truth and is still recorded.
+    try {
+      await Activity.create({
+        kickId: updatedUser.kickId,
+        type: "shop_purchase",
+        title: "Zakup w sklepie",
+        description: `Zakupiono przedmiot: "${item.name}" za ${price} pkt`,
+        pointsChange: -price,
+      })
+    } catch (err) {
+      console.error("Failed to write shop_purchase activity:", err)
+    }
+
+    return NextResponse.json({
+      purchase: {
+        ...purchaseDoc.toObject(),
+        _id: purchaseDoc._id.toString(),
+      },
+      newBalance: updatedUser.points,
+    })
   } catch (error) {
-    if (error instanceof Error) {
-      if (error.message === "Unauthorized") {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-      }
-      if (
-        [
-          "Item not found",
-          "Item is not available",
-          "Item is out of stock",
-          "Insufficient points",
-          "User not found",
-        ].includes(error.message)
-      ) {
-        return NextResponse.json({ error: error.message }, { status: 400 })
-      }
+    if (error instanceof Error && error.message === "Unauthorized") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
     console.error("Purchase error:", error)
     return NextResponse.json(

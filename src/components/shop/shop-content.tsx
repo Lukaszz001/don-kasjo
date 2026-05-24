@@ -46,7 +46,8 @@ import {
 } from "@/components/ui/select"
 import { useLanguage } from "@/lib/language-context"
 import { cn } from "@/lib/utils"
-import { PusherRefresh } from "@/components/common/pusher-refresh"
+import { useRouter } from "next/navigation"
+import { useEffect } from "react"
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
@@ -76,6 +77,14 @@ export function ShopContent({ initialItems }: { initialItems: ShopItem[] }) {
   const [sortBy, setSortBy] = useState<"featured" | "price-low" | "price-high" | "stock">("featured")
 
   const user = userData?.user
+  const router = useRouter()
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      router.refresh()
+    }, 60000)
+    return () => clearInterval(interval)
+  }, [router])
 
 
   // Filter and sort items
@@ -103,14 +112,64 @@ export function ShopContent({ initialItems }: { initialItems: ShopItem[] }) {
     if (!selectedItem) return
 
     setIsPurchasing(true)
-    
-    toast.success(t("shop.purchaseSuccess.title"), {
-      description: t("shop.purchaseSuccess.desc").replace("{name}", selectedItem.name).replace("{points}", selectedItem.price.toLocaleString()),
-    })
 
-    setSelectedItem(null)
-    setIsPurchasing(false)
-    mutateUser()
+    try {
+      const response = await fetch(`/api/shop/${selectedItem._id}/purchase`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      })
+
+      const data = await response.json().catch(() => ({}))
+
+      if (!response.ok) {
+        const apiError: string | undefined = data?.error
+        const errorKey = apiError ? `shop.error.${apiError}` : "shop.error.generic"
+        const translated = t(errorKey)
+        // Fall back to a generic message if the specific key is missing
+        const description =
+          translated === errorKey ? t("shop.error.generic") : translated
+
+        toast.error(t("shop.error.title"), { description })
+        return
+      }
+
+      toast.success(t("shop.purchaseSuccess.title"), {
+        description: t("shop.purchaseSuccess.desc")
+          .replace("{name}", selectedItem.name)
+          .replace("{points}", selectedItem.price.toLocaleString()),
+      })
+
+      // Optimistically update local stock so UI reflects the purchase immediately.
+      setItems((prev) =>
+        prev.map((it) =>
+          it._id === selectedItem._id && it.stock !== null && it.stock !== undefined
+            ? { ...it, stock: Math.max(0, it.stock - 1) }
+            : it
+        )
+      )
+
+      // Refresh user data so the new points balance from the API is shown.
+      if (typeof data?.newBalance === "number") {
+        await mutateUser(
+          (current: { user?: { points: number } } | undefined) =>
+            current?.user
+              ? { ...current, user: { ...current.user, points: data.newBalance } }
+              : current,
+          { revalidate: true }
+        )
+      } else {
+        await mutateUser()
+      }
+
+      setSelectedItem(null)
+    } catch (error) {
+      console.error("Purchase failed:", error)
+      toast.error(t("shop.error.title"), {
+        description: t("shop.error.generic"),
+      })
+    } finally {
+      setIsPurchasing(false)
+    }
   }
 
   // Calculate progress to next tier
@@ -119,7 +178,6 @@ export function ShopContent({ initialItems }: { initialItems: ShopItem[] }) {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 lg:px-8 relative">
-      <PusherRefresh channelName="platform-updates" eventName="shop-updated" />
       
       {/* Ambient background glows for the whole page */}
       <div className="absolute top-0 right-0 -z-10 h-[500px] w-[500px] bg-primary/5 blur-[120px]" />

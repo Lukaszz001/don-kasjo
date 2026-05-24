@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import useSWR from "swr"
-import { Search, Shield, ShieldOff, ShieldCheck, Coins, Clock, Users } from "lucide-react"
+import { Search, Shield, ShieldOff, Coins, Clock, Users } from "lucide-react"
 import { toast } from "sonner"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -22,7 +22,6 @@ interface User {
   points: number
   watchTimeMinutes: number
   isAdmin: boolean
-  isModerator: boolean
   createdAt: string
 }
 
@@ -51,28 +50,6 @@ export default function AdminUsersPage() {
 
       toast.success(
         user.isAdmin ? "Usunieto uprawnienia admina" : "Nadano uprawnienia admina"
-      )
-      mutate()
-    } catch {
-      toast.error("Nie udalo sie zaktualizowac uzytkownika")
-    } finally {
-      setIsUpdating(false)
-    }
-  }
-
-  const handleToggleModerator = async (user: User) => {
-    setIsUpdating(true)
-    try {
-      const response = await fetch(`/api/admin/users/${user._id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ isModerator: !user.isModerator }),
-      })
-
-      if (!response.ok) throw new Error("Failed to update user")
-
-      toast.success(
-        user.isModerator ? "Usunieto uprawnienia moderatora" : "Nadano uprawnienia moderatora"
       )
       mutate()
     } catch {
@@ -150,18 +127,13 @@ export default function AdminUsersPage() {
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <div className="flex items-center gap-2 flex-wrap">
+                    <div className="flex items-center gap-2">
                       <p className="font-medium text-foreground">
                         {user.kickUsername}
                       </p>
                       {user.isAdmin && (
                         <Badge className="bg-primary text-primary-foreground">
                           Admin
-                        </Badge>
-                      )}
-                      {user.isModerator && !user.isAdmin && (
-                        <Badge className="bg-blue-500/20 text-blue-400 border border-blue-500/30">
-                          Moderator
                         </Badge>
                       )}
                     </div>
@@ -184,7 +156,7 @@ export default function AdminUsersPage() {
                     </div>
                   </div>
 
-                  <div className="flex gap-2 flex-wrap justify-end">
+                  <div className="flex gap-2">
                     <Button
                       variant="outline"
                       size="sm"
@@ -192,25 +164,6 @@ export default function AdminUsersPage() {
                     >
                       <Coins className="mr-1 h-4 w-4" />
                       Punkty
-                    </Button>
-                    <Button
-                      variant={user.isModerator && !user.isAdmin ? "destructive" : "outline"}
-                      size="sm"
-                      onClick={() => handleToggleModerator(user)}
-                      disabled={isUpdating || user.isAdmin}
-                      title={user.isAdmin ? "Admin ma wszystkie uprawnienia" : ""}
-                    >
-                      {user.isModerator && !user.isAdmin ? (
-                        <>
-                          <ShieldOff className="mr-1 h-4 w-4" />
-                          Usun mod
-                        </>
-                      ) : (
-                        <>
-                          <ShieldCheck className="mr-1 h-4 w-4" />
-                          Nadaj mod
-                        </>
-                      )}
                     </Button>
                     <Button
                       variant={user.isAdmin ? "destructive" : "outline"}

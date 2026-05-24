@@ -118,10 +118,10 @@ export default function ProfilePage() {
               {t("profile.notLoggedIn.desc")}
             </p>
             <Button asChild size="lg" className="mt-8 bg-primary hover:bg-primary/90 px-8 h-12 text-base gap-2 btn-interactive">
-              <Link href="/api/auth/kick">
+              <a href="/api/auth/kick">
                 <Zap className="h-5 w-5" />
                 {t("profile.loginWithKick")}
-              </Link>
+              </a>
             </Button>
           </CardContent>
         </Card>

@@ -3,8 +3,7 @@ import { z } from "zod"
 import mongoose from "mongoose"
 import { connectToDatabase } from "@/lib/db/mongodb"
 import { Prediction, User, UserBet } from "@/lib/db/models"
-import { requireModerator } from "@/lib/auth/session"
-import { triggerUpdate } from "@/lib/pusher-server"
+import { requireAdmin } from "@/lib/auth/session"
 
 const resolveSchema = z.object({
   winningOption: z.union([z.literal(1), z.literal(2)]),
@@ -19,7 +18,7 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await requireModerator()
+    const session = await requireAdmin()
     const { id } = await params
     const body = await request.json()
 
@@ -69,9 +68,6 @@ export async function POST(
         await dbSession.endSession()
       }
 
-      await triggerUpdate("platform-updates", "predictions-updated")
-      await triggerUpdate("platform-updates", "leaderboard-updated")
-
       return NextResponse.json({
         message: "Prediction refunded",
         refundedBets: bets.length,
@@ -112,9 +108,6 @@ export async function POST(
     } finally {
       await dbSession.endSession()
     }
-
-    await triggerUpdate("platform-updates", "predictions-updated")
-    await triggerUpdate("platform-updates", "leaderboard-updated")
 
     return NextResponse.json({
       message: "Prediction resolved",

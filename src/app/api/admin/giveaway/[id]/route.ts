@@ -2,8 +2,7 @@ import { NextResponse } from "next/server"
 import { connectToDatabase } from "@/lib/db/mongodb"
 import { Giveaway } from "@/lib/db/models"
 import { redis } from "@/lib/db/redis"
-import { requireModerator } from "@/lib/auth/session"
-import { triggerUpdate } from "@/lib/pusher-server"
+import { requireAdmin } from "@/lib/auth/session"
 import { z } from "zod"
 
 const updateSchema = z.object({
@@ -15,7 +14,7 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await requireModerator()
+    await requireAdmin()
     const { id } = await params
     const body = await req.json()
     const parsed = updateSchema.safeParse(body)
@@ -33,11 +32,6 @@ export async function PATCH(
       await redis.del("giveaway:active")
       await giveaway.save()
 
-      await triggerUpdate("platform-updates", "giveaway-updated", {
-        id: giveaway._id.toString(),
-        status: "stopped",
-        participantCount: giveaway.participants.length,
-      })
     }
 
     if (action === "draw") {
@@ -54,12 +48,6 @@ export async function PATCH(
       await redis.del("giveaway:active")
       await giveaway.save()
 
-      await triggerUpdate("platform-updates", "giveaway-updated", {
-        id: giveaway._id.toString(),
-        status: "drawn",
-        winner: { kickId: winner.kickId, username: winner.username },
-        participantCount: giveaway.participants.length,
-      })
     }
 
     if (action === "reset") {
@@ -74,11 +62,6 @@ export async function PATCH(
       )
       await giveaway.save()
 
-      await triggerUpdate("platform-updates", "giveaway-updated", {
-        id: giveaway._id.toString(),
-        status: "collecting",
-        participantCount: 0,
-      })
     }
 
     return NextResponse.json({
@@ -98,7 +81,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await requireModerator()
+    await requireAdmin()
     const { id } = await params
     await connectToDatabase()
 
@@ -117,10 +100,6 @@ export async function DELETE(
     await Giveaway.findByIdAndDelete(id)
     await redis.del(`giveaway:${id}:participants`)
 
-    await triggerUpdate("platform-updates", "giveaway-updated", {
-      id,
-      action: "deleted"
-    })
 
     return NextResponse.json({ success: true })
   } catch (error) {

@@ -4,12 +4,21 @@ import { User } from "@/lib/db/models"
 import { connectToDatabase } from "@/lib/db/mongodb"
 import { redis } from "@/lib/db/redis"
 
+export const dynamic = "force-dynamic"
+
 export async function GET() {
   try {
     const user = await getCurrentUser()
 
     if (!user) {
-      return NextResponse.json({ user: null })
+      return NextResponse.json(
+        { user: null },
+        {
+          headers: {
+            "Cache-Control": "no-store, max-age=0, must-revalidate",
+          },
+        }
+      )
     }
 
     // 1. Try to get rank from Redis cache first
@@ -28,25 +37,38 @@ export async function GET() {
       await redis.set(cacheKey, finalRank.toString(), "EX", 60)
     }
 
-    return NextResponse.json({
-      user: {
-        id: user._id.toString(),
-        kickId: user.kickId,
-        kickUsername: user.kickUsername,
-        kickAvatar: user.kickAvatar,
-        points: user.points,
-        watchTimeMinutes: user.watchTimeMinutes,
-        isAdmin: user.isAdmin,
-        isModerator: user.isModerator || false,
-        isDeveloper: user.isDeveloper || false,
-        stakeUsername: user.stakeUsername,
-        isStakeVerified: user.isStakeVerified,
-        lastStakeVerificationDate: user.lastStakeVerificationDate,
-        rank: finalRank,
+    return NextResponse.json(
+      {
+        user: {
+          id: user._id.toString(),
+          kickId: user.kickId,
+          kickUsername: user.kickUsername,
+          kickAvatar: user.kickAvatar,
+          points: user.points,
+          watchTimeMinutes: user.watchTimeMinutes,
+          isAdmin: user.isAdmin,
+          isDeveloper: user.isDeveloper || false,
+          stakeUsername: user.stakeUsername,
+          isStakeVerified: user.isStakeVerified,
+          lastStakeVerificationDate: user.lastStakeVerificationDate,
+          rank: finalRank,
+        },
       },
-    })
+      {
+        headers: {
+          "Cache-Control": "no-store, max-age=0, must-revalidate",
+        },
+      }
+    )
   } catch (error) {
     console.error("Get user error:", error)
-    return NextResponse.json({ user: null })
+    return NextResponse.json(
+      { user: null },
+      {
+        headers: {
+          "Cache-Control": "no-store, max-age=0, must-revalidate",
+        },
+      }
+    )
   }
 }
