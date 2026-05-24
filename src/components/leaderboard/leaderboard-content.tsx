@@ -20,8 +20,7 @@ import { Progress } from "@/components/ui/progress"
 import { useLanguage } from "@/lib/language-context"
 import { useRouter } from "next/navigation"
 import useSWR from "swr"
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json())
+import { apiFetcher } from "@/lib/api-client"
 
 interface LeaderboardEntry {
   rank: number
@@ -35,7 +34,7 @@ type SortMode = "points" | "time"
 
 export function LeaderboardContent({ initialLeaderboard }: { initialLeaderboard: LeaderboardEntry[] }) {
   const { t } = useLanguage()
-  const { data: userData } = useSWR("/api/auth/me", fetcher)
+  const { data: userData } = useSWR("/api/auth/me", apiFetcher)
   const user = userData?.user
   const router = useRouter()
 

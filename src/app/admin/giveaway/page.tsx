@@ -10,8 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { AdminModal } from "@/components/admin/admin-modal"
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json())
+import { apiFetcher, apiRequest } from "@/lib/api-client"
 
 interface Participant {
   kickId: string
@@ -141,7 +140,7 @@ function DrawModal({ giveaway, onClose, onDrawn }: { giveaway: Giveaway; onClose
   const startDraw = useCallback(async () => {
     if (names.length === 0) return
     setPhase("spinning")
-    const apiPromise = fetch(`/api/admin/giveaway/${giveaway._id}`, {
+    const apiPromise = apiRequest(`/api/admin/giveaway/${giveaway._id}`, {
       method: "PATCH", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "draw" }),
     }).then((r) => r.json())
@@ -274,8 +273,10 @@ function DrawModal({ giveaway, onClose, onDrawn }: { giveaway: Giveaway; onClose
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function AdminGiveawayPage() {
-  const { data, mutate } = useSWR<{ giveaways: Giveaway[] }>("/api/admin/giveaway", fetcher, {
-    refreshInterval: 5000
+  const { data, mutate } = useSWR<{ giveaways: Giveaway[] }>("/api/admin/giveaway", apiFetcher, {
+    revalidateOnFocus: true,
+    revalidateOnReconnect: true,
+    refreshInterval: () => document.visibilityState === "visible" ? 5000 : 0,
   })
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [drawTargetId, setDrawTargetId] = useState<string | null>(null)
@@ -292,7 +293,7 @@ export default function AdminGiveawayPage() {
     if (!phrase.trim()) { toast.error("Wpisz frazę"); return }
     setIsSubmitting(true)
     try {
-      const res = await fetch("/api/admin/giveaway", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ phrase: phrase.trim() }) })
+      const res = await apiRequest("/api/admin/giveaway", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ phrase: phrase.trim() }) })
       if (!res.ok) throw new Error()
       toast.success("Konkurs uruchomiony!")
       setIsCreateOpen(false); setPhrase(""); mutate()
@@ -303,7 +304,7 @@ export default function AdminGiveawayPage() {
   const handleSimpleAction = async (id: string, action: "stop" | "reset") => {
     setIsSubmitting(true)
     try {
-      const res = await fetch(`/api/admin/giveaway/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action }) })
+      const res = await apiRequest(`/api/admin/giveaway/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action }) })
       if (!res.ok) { const e = await res.json(); throw new Error(e.error) }
       toast.success(action === "stop" ? "Zatrzymano" : "Zresetowano"); mutate()
     } catch (e: any) { toast.error(e.message || "Błąd") }
@@ -314,7 +315,7 @@ export default function AdminGiveawayPage() {
     if (!confirm("Czy na pewno chcesz usunąć ten konkurs?")) return
     setIsSubmitting(true)
     try {
-      const res = await fetch(`/api/admin/giveaway/${id}`, { method: "DELETE" })
+      const res = await apiRequest(`/api/admin/giveaway/${id}`, { method: "DELETE" })
       if (!res.ok) throw new Error()
       toast.success("Konkurs usunięty")
       mutate()

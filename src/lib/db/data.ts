@@ -1,12 +1,21 @@
+import { serverFetch } from "@/lib/server-fetch"
+
 function getBaseUrl() {
-  if (process.env.NEXT_PUBLIC_APP_URL) return process.env.NEXT_PUBLIC_APP_URL
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "")
+
+  if (appUrl?.startsWith("https://")) return appUrl
   if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`
+
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("NEXT_PUBLIC_APP_URL must be an https URL in production")
+  }
+
   return 'http://localhost:3000'
 }
 
 export async function getPartners() {
   try {
-    const res = await fetch(`${getBaseUrl()}/api/partners`, { cache: 'no-store' })
+    const res = await serverFetch(`${getBaseUrl()}/api/partners`)
     if (!res.ok) return []
     const data = await res.json()
     return data.partners || []
@@ -19,7 +28,7 @@ export async function getPredictions(status?: string) {
   try {
     const url = new URL(`${getBaseUrl()}/api/predictions`)
     if (status) url.searchParams.set('status', status)
-    const res = await fetch(url.toString(), { cache: 'no-store' })
+    const res = await serverFetch(url.toString())
     if (!res.ok) return []
     const data = await res.json()
     return data.predictions || []
@@ -30,7 +39,7 @@ export async function getPredictions(status?: string) {
 
 export async function getShopItems() {
   try {
-    const res = await fetch(`${getBaseUrl()}/api/shop`, { cache: 'no-store' })
+    const res = await serverFetch(`${getBaseUrl()}/api/shop`)
     if (!res.ok) return []
     const data = await res.json()
     return data.items || []
@@ -41,7 +50,7 @@ export async function getShopItems() {
 
 export async function getInstructions() {
   try {
-    const res = await fetch(`${getBaseUrl()}/api/instructions`, { cache: 'no-store' })
+    const res = await serverFetch(`${getBaseUrl()}/api/instructions`)
     if (!res.ok) return []
     const data = await res.json()
     return data.instructions || []
@@ -52,7 +61,7 @@ export async function getInstructions() {
 
 export async function getInstructionBySlug(slug: string) {
   try {
-    const res = await fetch(`${getBaseUrl()}/api/instructions/${slug}`, { cache: 'no-store' })
+    const res = await serverFetch(`${getBaseUrl()}/api/instructions/${slug}`)
     if (!res.ok) return null
     const data = await res.json()
     return data.instruction || null
@@ -63,7 +72,7 @@ export async function getInstructionBySlug(slug: string) {
 
 export async function getLeaderboard() {
   try {
-    const res = await fetch(`${getBaseUrl()}/api/leaderboard`, { cache: 'no-store' })
+    const res = await serverFetch(`${getBaseUrl()}/api/leaderboard`)
     if (!res.ok) return []
     const data = await res.json()
     return data.leaderboard || []
@@ -74,7 +83,7 @@ export async function getLeaderboard() {
 
 export async function getGlobalStats() {
   try {
-    const res = await fetch(`${getBaseUrl()}/api/stats`, { cache: 'no-store' })
+    const res = await serverFetch(`${getBaseUrl()}/api/stats`)
     if (!res.ok) return { totalUsers: 0, pointsInCirculation: 0 }
     const data = await res.json()
     return {

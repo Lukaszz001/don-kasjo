@@ -31,8 +31,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { cn } from "@/lib/utils"
 import { useLanguage } from "@/lib/language-context"
 import { Logo } from "./logo"
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json())
+import { apiFetcher, apiRequest } from "@/lib/api-client"
 
 const DiscordIcon = (props: any) => (
   <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
@@ -45,9 +44,10 @@ export function SidebarNav({ initialUser }: { initialUser?: any }) {
   const router = useRouter()
   const { language, setLanguage, t } = useLanguage()
   const [mobileOpen, setMobileOpen] = useState(false)
-  const { data, mutate } = useSWR("/api/auth/me", fetcher, {
+  const { data, mutate } = useSWR("/api/auth/me", apiFetcher, {
     fallbackData: initialUser ? { user: initialUser } : undefined,
-    revalidateOnFocus: false,
+    revalidateOnFocus: true,
+    revalidateOnReconnect: true,
     dedupingInterval: 60000, // Cache for 1 minute
   })
   const user = data?.user
@@ -81,7 +81,7 @@ export function SidebarNav({ initialUser }: { initialUser?: any }) {
   const navigation = isAdminRoute ? adminNavigation : mainNavigation
 
   const handleLogout = async () => {
-    await fetch("/api/auth/logout", { method: "POST" })
+    await apiRequest("/api/auth/logout", { method: "POST" })
     mutate({ user: null })
     router.push("/")
   }

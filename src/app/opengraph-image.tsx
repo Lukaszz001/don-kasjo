@@ -6,10 +6,6 @@ export const size = { width: 1200, height: 630 }
 export const contentType = "image/png"
 
 export default async function Image() {
-  const font = await fetch(
-    "https://fonts.gstatic.com/s/archivoblack/v22/HTxqL289NzCGg4MzN6KJ7eW6OYuP_x7yx3A.woff2"
-  ).then((res) => res.arrayBuffer())
-
   return new ImageResponse(
     (
       <div
@@ -23,10 +19,9 @@ export default async function Image() {
           justifyContent: "center",
           position: "relative",
           overflow: "hidden",
-          fontFamily: "'Archivo Black', sans-serif",
+          fontFamily: "'Arial Black', Impact, sans-serif",
         }}
       >
-        {/* Grid background */}
         <div
           style={{
             position: "absolute",
@@ -37,7 +32,6 @@ export default async function Image() {
           }}
         />
 
-        {/* Radial glow center */}
         <div
           style={{
             position: "absolute",
@@ -51,7 +45,6 @@ export default async function Image() {
           }}
         />
 
-        {/* Top glow line */}
         <div
           style={{
             position: "absolute",
@@ -63,7 +56,6 @@ export default async function Image() {
           }}
         />
 
-        {/* Bottom glow line */}
         <div
           style={{
             position: "absolute",
@@ -75,7 +67,6 @@ export default async function Image() {
           }}
         />
 
-        {/* LIVE badge */}
         <div
           style={{
             display: "flex",
@@ -102,7 +93,6 @@ export default async function Image() {
           </span>
         </div>
 
-        {/* Title */}
         <div
           style={{
             fontSize: 96,
@@ -117,7 +107,6 @@ export default async function Image() {
           DON KASJO
         </div>
 
-        {/* Subtitle */}
         <div
           style={{
             marginTop: 20,
@@ -130,7 +119,6 @@ export default async function Image() {
           Zbieraj punkty • Predykcje • Sklep • Giveaway
         </div>
 
-        {/* Bottom pills */}
         <div
           style={{
             display: "flex",
@@ -156,7 +144,6 @@ export default async function Image() {
           ))}
         </div>
 
-        {/* Corner watermark */}
         <div
           style={{
             position: "absolute",
@@ -173,7 +160,6 @@ export default async function Image() {
     ),
     {
       ...size,
-      fonts: [{ name: "Archivo Black", data: font, style: "normal", weight: 900 }],
     }
   )
 }

@@ -5,6 +5,7 @@ import { getAppAccessToken } from "@/lib/auth/kick"
 import { redis } from "@/lib/db/redis"
 import { getCurrentUser } from "@/lib/auth/session"
 import { getConfig, CONFIG_KEYS } from "@/lib/config"
+import { serverFetch } from "@/lib/server-fetch"
 
 const DEFAULT_KICK_CHANNEL = process.env.NEXT_PUBLIC_KICK_CHANNEL_ID || process.env.KICK_CHANNEL_ID || "donkasjo"
 
@@ -47,11 +48,10 @@ export async function GET() {
       const params = new URLSearchParams()
       params.append("slug", configChannel)
 
-      const response = await fetch(
+      const response = await serverFetch(
         `https://api.kick.com/public/v1/channels?${params.toString()}`,
         {
           headers: { Authorization: `Bearer ${token}` },
-          next: { revalidate: 300 }, // cached for 5 minutes
         }
       )
       

@@ -1,8 +1,7 @@
 "use client"
 
 import useSWR from "swr"
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json())
+import { apiFetcher } from "@/lib/api-client"
 
 /**
  * Shared hook for stream status. Uses SWR with a single shared cache key.
@@ -10,10 +9,10 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json())
  * Polls every 30 seconds for updates.
  */
 export function useStreamStatus() {
-  const { data, isLoading } = useSWR("/api/kick/stream-status", fetcher, {
-    revalidateOnFocus: false,
-    revalidateOnReconnect: false,
-    refreshInterval: 30000,
+  const { data, isLoading } = useSWR("/api/kick/stream-status", apiFetcher, {
+    revalidateOnFocus: true,
+    revalidateOnReconnect: true,
+    refreshInterval: () => document.visibilityState === "visible" ? 30000 : 0,
   })
 
   return {

@@ -42,6 +42,14 @@ interface Game {
   isOpened: boolean
 }
 
+function createClientId() {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return crypto.randomUUID()
+  }
+
+  return `${Date.now()}-${Math.random().toString(36).slice(2)}`
+}
+
 export default function BonusHuntPage() {
   const { t } = useLanguage()
   const [isHydrated, setIsHydrated] = useState(false)
@@ -95,7 +103,7 @@ export default function BonusHuntPage() {
   const addGame = () => {
     if (!newGameName.trim()) return
     const newGame: Game = {
-      id: crypto.randomUUID(),
+      id: createClientId(),
       name: newGameName,
       bet: parseFloat(newGameBet) || 0,
       win: 0,

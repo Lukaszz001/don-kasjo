@@ -33,8 +33,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { cn } from "@/lib/utils"
 import { useLanguage } from "@/lib/language-context"
 import { Logo } from "./logo"
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json())
+import { apiFetcher, apiRequest } from "@/lib/api-client"
 
 const DiscordIcon = (props: any) => (
   <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
@@ -47,7 +46,7 @@ export function Header() {
   const router = useRouter()
   const { t } = useLanguage()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const { data, mutate } = useSWR("/api/auth/me", fetcher)
+  const { data, mutate } = useSWR("/api/auth/me", apiFetcher)
   const user = data?.user
 
   const navigation = [
@@ -60,7 +59,7 @@ export function Header() {
   ]
 
   const handleLogout = async () => {
-    await fetch("/api/auth/logout", { method: "POST" })
+    await apiRequest("/api/auth/logout", { method: "POST" })
     mutate({ user: null })
     router.push("/")
   }

@@ -48,8 +48,7 @@ import { useLanguage } from "@/lib/language-context"
 import { cn } from "@/lib/utils"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json())
+import { apiFetcher, apiRequest } from "@/lib/api-client"
 
 interface ShopItem {
   _id: string
@@ -64,8 +63,9 @@ interface ShopItem {
 
 export function ShopContent({ initialItems }: { initialItems: ShopItem[] }) {
   const { t } = useLanguage()
-  const { data: userData, mutate: mutateUser } = useSWR("/api/auth/me", fetcher, {
-    revalidateOnFocus: false,
+  const { data: userData, mutate: mutateUser } = useSWR("/api/auth/me", apiFetcher, {
+    revalidateOnFocus: true,
+    revalidateOnReconnect: true,
     dedupingInterval: 60000,
   })
 
@@ -114,7 +114,7 @@ export function ShopContent({ initialItems }: { initialItems: ShopItem[] }) {
     setIsPurchasing(true)
 
     try {
-      const response = await fetch(`/api/shop/${selectedItem._id}/purchase`, {
+      const response = await apiRequest(`/api/shop/${selectedItem._id}/purchase`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
       })

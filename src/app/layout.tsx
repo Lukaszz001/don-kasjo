@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from "next"
-import { Inter, Archivo_Black } from "next/font/google"
 import { cookies } from "next/headers"
 import { Analytics } from "@vercel/analytics/next"
 import { Toaster } from "sonner"
@@ -8,27 +7,18 @@ import { LanguageProvider } from "@/lib/language-context"
 import { getCurrentUser } from "@/lib/auth/session"
 import "./globals.css"
 
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-  display: "swap",
-})
-
-const archivoBlack = Archivo_Black({
-  weight: "400",
-  subsets: ["latin"],
-  variable: "--font-archivo-black",
-  display: "swap",
-})
+const appUrl =
+  process.env.NEXT_PUBLIC_APP_URL ||
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000")
 
 export const metadata: Metadata = {
+  metadataBase: new URL(appUrl),
   title: {
     default: "Don Kasjo - Platforma Streamingowa",
     template: "%s | Don Kasjo",
   },
   description:
-    "Oficjalna platforma streamingowa z systemem punktow, predykcjami i nagrodami. Ogladaj transmisje, zbieraj punkty i wymieniaj je na nagrody!!",
+    "Oficjalna platforma streamingowa z systemem punktow, predykcjami i nagrodami. Ogladaj transmisje, zbieraj punkty i wymieniaj je na nagrody!",
   icons: {
     icon: "/kasyno8.png",
     apple: "/kasyno8.png",
@@ -71,7 +61,7 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} suppressHydrationWarning data-scroll-behavior="smooth">
-      <body className={`${inter.variable} ${archivoBlack.variable} font-sans antialiased min-h-dvh`} suppressHydrationWarning>
+      <body className="font-sans antialiased min-h-dvh" suppressHydrationWarning>
         <div className="ambient-glow-1" />
         <div className="ambient-glow-2" />
 

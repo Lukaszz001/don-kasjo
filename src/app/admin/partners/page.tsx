@@ -38,6 +38,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { toast } from "sonner"
+import { apiRequest } from "@/lib/api-client"
 
 interface Partner {
   _id: string
@@ -80,7 +81,7 @@ export default function AdminPartnersPage() {
   const fetchPartners = async () => {
     setLoading(true)
     try {
-      const res = await fetch("/api/admin/partners")
+      const res = await apiRequest("/api/admin/partners")
       const data = await res.json()
       setPartners(data.partners || [])
     } catch (error) {
@@ -135,7 +136,7 @@ export default function AdminPartnersPage() {
         ? { ...formData, _id: editingPartner._id } 
         : formData
 
-      const res = await fetch("/api/admin/partners", {
+      const res = await apiRequest("/api/admin/partners", {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body)
@@ -156,7 +157,7 @@ export default function AdminPartnersPage() {
     if (!confirm("Czy na pewno chcesz usunąć tego partnera?")) return
 
     try {
-      const res = await fetch(`/api/admin/partners?id=${id}`, {
+      const res = await apiRequest(`/api/admin/partners?id=${id}`, {
         method: "DELETE"
       })
       

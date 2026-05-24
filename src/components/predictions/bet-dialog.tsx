@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { apiRequest } from "@/lib/api-client"
 
 interface Prediction {
   _id: string
@@ -70,7 +71,7 @@ export function PredictionBetDialog({
 
     setIsLoading(true)
     try {
-      const response = await fetch(`/api/predictions/${prediction._id}/bet`, {
+      const response = await apiRequest(`/api/predictions/${prediction._id}/bet`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

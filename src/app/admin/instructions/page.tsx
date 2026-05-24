@@ -34,6 +34,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog"
 import { toast } from "sonner"
+import { apiRequest } from "@/lib/api-client"
 
 interface Instruction {
   _id: string
@@ -71,7 +72,7 @@ export default function AdminInstructionsPage() {
   const fetchInstructions = async () => {
     setLoading(true)
     try {
-      const res = await fetch("/api/admin/instructions")
+      const res = await apiRequest("/api/admin/instructions")
       const data = await res.json()
       setInstructions(data.instructions || [])
     } catch (error) {
@@ -118,7 +119,7 @@ export default function AdminInstructionsPage() {
         ? { ...formData, _id: editingInstruction._id } 
         : formData
 
-      const res = await fetch("/api/admin/instructions", {
+      const res = await apiRequest("/api/admin/instructions", {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body)
@@ -139,7 +140,7 @@ export default function AdminInstructionsPage() {
     if (!confirm("Czy na pewno chcesz usunąć tę instrukcję?")) return
 
     try {
-      const res = await fetch(`/api/admin/instructions?id=${id}`, {
+      const res = await apiRequest(`/api/admin/instructions?id=${id}`, {
         method: "DELETE"
       })
       
@@ -543,4 +544,3 @@ function EditorButton({ label, title, tag, onClick }: { label: string, title: st
     </button>
   )
 }
-

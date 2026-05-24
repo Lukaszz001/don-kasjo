@@ -1,5 +1,6 @@
 import { nanoid } from "nanoid"
 import crypto from "crypto"
+import { serverFetch } from "@/lib/server-fetch"
 
 const KICK_CLIENT_ID = process.env.KICK_CLIENT_ID!
 const KICK_CLIENT_SECRET = process.env.KICK_CLIENT_SECRET!
@@ -49,7 +50,7 @@ export async function exchangeCodeForTokens(
   code: string,
   codeVerifier: string
 ): Promise<KickTokens> {
-  const response = await fetch("https://id.kick.com/oauth/token", {
+  const response = await serverFetch("https://id.kick.com/oauth/token", {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
@@ -74,7 +75,7 @@ export async function exchangeCodeForTokens(
 
 // Get user info from Kick API
 export async function getKickUser(accessToken: string): Promise<KickUser> {
-  const response = await fetch("https://api.kick.com/public/v1/users", {
+  const response = await serverFetch("https://api.kick.com/public/v1/users", {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
@@ -92,7 +93,7 @@ export async function getKickUser(accessToken: string): Promise<KickUser> {
 export async function refreshAccessToken(
   refreshToken: string
 ): Promise<KickTokens> {
-  const response = await fetch("https://id.kick.com/oauth/token", {
+  const response = await serverFetch("https://id.kick.com/oauth/token", {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
@@ -119,7 +120,7 @@ export async function getAppAccessToken(): Promise<string> {
     return cachedAppToken.token
   }
 
-  const response = await fetch("https://id.kick.com/oauth/token", {
+  const response = await serverFetch("https://id.kick.com/oauth/token", {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",

@@ -25,8 +25,7 @@ import { isPast, differenceInSeconds } from "date-fns"
 import { useLanguage } from "@/lib/language-context"
 import { cn } from "@/lib/utils"
 import useSWR from "swr"
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json())
+import { apiFetcher } from "@/lib/api-client"
 
 function formatNumber(num: number | undefined | null): string {
   if (num === undefined || num === null) return "0"
@@ -50,14 +49,17 @@ interface Prediction {
 
 export function PredictionsContent({ initialPredictions }: { initialPredictions: Prediction[] }) {
   const { t } = useLanguage()
-  const { data: response, mutate: mutatePredictions } = useSWR<{ predictions: Prediction[] }>("/api/predictions", fetcher, { 
+  const { data: response, mutate: mutatePredictions } = useSWR<{ predictions: Prediction[] }>("/api/predictions", apiFetcher, { 
     fallbackData: { predictions: initialPredictions },
-    revalidateOnFocus: false,
-    refreshInterval: 10000
+    revalidateOnFocus: true,
+    revalidateOnReconnect: true,
+    refreshInterval: () => document.visibilityState === "visible" ? 10000 : 0,
   })
   
-  const { data: userData, mutate: mutateUser } = useSWR("/api/auth/me", fetcher, {
-    refreshInterval: 10000
+  const { data: userData, mutate: mutateUser } = useSWR("/api/auth/me", apiFetcher, {
+    revalidateOnFocus: true,
+    revalidateOnReconnect: true,
+    refreshInterval: () => document.visibilityState === "visible" ? 10000 : 0,
   })
   const [selectedPrediction, setSelectedPrediction] = useState<Prediction | null>(null)
 

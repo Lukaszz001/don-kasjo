@@ -2,12 +2,6 @@ import { ImageResponse } from "next/og"
 
 export const OG_SIZE = { width: 1200, height: 630 }
 
-export async function getArchivoBlack() {
-  return fetch(
-    "https://fonts.gstatic.com/s/archivoblack/v22/HTxqL289NzCGg4MzN6KJ7eW6OYuP_x7yx3A.woff2"
-  ).then((res) => res.arrayBuffer())
-}
-
 interface OGConfig {
   title: string
   subtitle: string
@@ -18,7 +12,6 @@ interface OGConfig {
 
 export async function generateOGImage(config: OGConfig) {
   const { title, subtitle, badge, emoji, accentColor = "#22c55e" } = config
-  const font = await getArchivoBlack()
 
   const accentAlpha18 = `${accentColor}2e`
   const accentAlpha30 = `${accentColor}4d`
@@ -36,7 +29,7 @@ export async function generateOGImage(config: OGConfig) {
           justifyContent: "center",
           position: "relative",
           overflow: "hidden",
-          fontFamily: "'Archivo Black', sans-serif",
+          fontFamily: "'Arial Black', Impact, sans-serif",
         }}
       >
         {/* Grid */}
@@ -179,7 +172,6 @@ export async function generateOGImage(config: OGConfig) {
     ),
     {
       ...OG_SIZE,
-      fonts: [{ name: "Archivo Black", data: font, style: "normal", weight: 900 }],
     }
   )
 }

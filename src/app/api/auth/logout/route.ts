@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { destroySession } from "@/lib/auth/session"
 
 export async function POST() {
@@ -11,12 +11,14 @@ export async function POST() {
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const appUrl = (process.env.NEXT_PUBLIC_APP_URL || request.nextUrl.origin).replace(/\/$/, "")
+
   try {
     await destroySession()
-    return NextResponse.redirect(process.env.NEXT_PUBLIC_APP_URL || "/")
+    return NextResponse.redirect(appUrl)
   } catch (error) {
     console.error("Logout error:", error)
-    return NextResponse.redirect(process.env.NEXT_PUBLIC_APP_URL || "/")
+    return NextResponse.redirect(appUrl)
   }
 }
