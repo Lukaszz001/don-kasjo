@@ -34,7 +34,6 @@ export async function getEventsSubscriptions(broadcasterId?: number) {
   }
 
   const data = await response.json()
-  console.log(data)
   return data.data as KickSubscription[]
 }
 
@@ -110,6 +109,7 @@ export async function getChannelBySlug(slug: string) {
   return data.data?.[0]
 }
 
+const MAIN_CHANNELS = [8916283] // Twoje ID
 const REQUIRED_EVENTS = [
   "chat.message.sent",
   "channel.followed",
@@ -119,26 +119,12 @@ const REQUIRED_EVENTS = [
 ]
 
 export async function ensureKickSubscription() {
-  const slugsRaw = process.env.NEXT_PUBLIC_KICK_CHANNEL_ID
-  if (!slugsRaw) {
-    console.error("[Kick-API] NEXT_PUBLIC_KICK_CHANNEL_ID not set")
-    return false
-  }
-
-  const slugs = slugsRaw.split(",").map((s) => s.trim()).filter(Boolean)
-
   try {
-    for (const slug of slugs) {
-      const channel = await getChannelBySlug(slug)
-      if (!channel?.broadcaster_user_id) {
-        console.warn(`[Kick-API] channel '${slug}' not found`)
-        continue
-      }
+    for (const broadcasterId of MAIN_CHANNELS) {
       await subscribeToEvents(
-        channel.broadcaster_user_id,
-        REQUIRED_EVENTS.map((name) => ({ name, version: 1 }))
+        broadcasterId,
+        REQUIRED_EVENTS.map(name => ({ name, version: 1 }))
       )
-      console.log(`[Kick-API] subscribed: ${slug} → ${channel.broadcaster_user_id}`)
     }
     return true
   } catch (error) {

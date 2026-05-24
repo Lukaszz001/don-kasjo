@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 import { connectToDatabase } from "@/lib/db/mongodb"
 import { Giveaway } from "@/lib/db/models"
 import { redis } from "@/lib/db/redis"
-import { requireAdmin } from "@/lib/auth/session"
+import { requireModerator } from "@/lib/auth/session"
 import { triggerUpdate } from "@/lib/pusher-server"
 import { z } from "zod"
 
@@ -15,7 +15,7 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await requireAdmin()
+    await requireModerator()
     const { id } = await params
     const body = await req.json()
     const parsed = updateSchema.safeParse(body)
@@ -98,7 +98,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await requireAdmin()
+    await requireModerator()
     const { id } = await params
     await connectToDatabase()
 

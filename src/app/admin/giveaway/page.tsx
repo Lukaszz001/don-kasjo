@@ -292,7 +292,7 @@ export default function AdminGiveawayPage() {
     const pusher = getPusherClient()
     const ch = pusher.subscribe("platform-updates")
 
-    const handler = (payload: {
+    ch.bind("giveaway-updated", (payload: {
       id: string
       status: string
       participantCount: number
@@ -306,6 +306,7 @@ export default function AdminGiveawayPage() {
           return {
             giveaways: prev.giveaways.map((g) => {
               if (g._id !== payload.id) return g
+              // Avoid duplicates
               const alreadyExists = g.participants.some(
                 (p) => p.kickId === payload.newParticipant!.kickId
               )
@@ -322,15 +323,14 @@ export default function AdminGiveawayPage() {
           }
         }, { revalidate: false })
       } else {
+        // For status changes (stop, draw, reset) — full re-fetch
         mutate()
       }
-    }
-
-    ch.bind("giveaway-updated", handler)
+    })
 
     return () => {
-      // Channel "platform-updates" is shared — unbind only this handler.
-      ch.unbind("giveaway-updated", handler)
+      ch.unbind("giveaway-updated")
+      pusher.unsubscribe("platform-updates")
     }
   }, [mutate])
 

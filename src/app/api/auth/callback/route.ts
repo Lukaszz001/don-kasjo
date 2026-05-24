@@ -61,6 +61,7 @@ export async function GET(request: NextRequest) {
       kickUsername: user.kickUsername,
       kickAvatar: user.kickAvatar,
       isAdmin: user.isAdmin,
+      isModerator: user.isModerator,
       accessToken: tokens.access_token,
       refreshToken: tokens.refresh_token,
     })

@@ -3,7 +3,7 @@ import { z } from "zod"
 import mongoose from "mongoose"
 import { connectToDatabase } from "@/lib/db/mongodb"
 import { Prediction, User, UserBet } from "@/lib/db/models"
-import { requireAdmin } from "@/lib/auth/session"
+import { requireModerator } from "@/lib/auth/session"
 import { triggerUpdate } from "@/lib/pusher-server"
 
 const resolveSchema = z.object({
@@ -19,7 +19,7 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await requireAdmin()
+    const session = await requireModerator()
     const { id } = await params
     const body = await request.json()
 

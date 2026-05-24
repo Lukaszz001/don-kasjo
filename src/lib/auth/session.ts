@@ -13,6 +13,7 @@ export interface SessionData {
   kickUsername: string
   kickAvatar: string
   isAdmin: boolean
+  isModerator: boolean
   accessToken: string
   refreshToken: string
 }
@@ -65,6 +66,14 @@ export async function requireAuth(): Promise<SessionData> {
 export async function requireAdmin(): Promise<SessionData> {
   const session = await requireAuth()
   if (!session.isAdmin) {
+    throw new Error("Forbidden")
+  }
+  return session
+}
+
+export async function requireModerator(): Promise<SessionData> {
+  const session = await requireAuth()
+  if (!session.isAdmin && !session.isModerator) {
     throw new Error("Forbidden")
   }
   return session

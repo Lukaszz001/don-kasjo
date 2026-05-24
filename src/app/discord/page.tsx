@@ -22,7 +22,7 @@ export default function DiscordPage() {
   const { t } = useLanguage()
 
   // Change this to the actual Discord invite link if known
-  const discordInvite = "https://discord.gg/turbofamilia"
+  const discordInvite = "https://discord.gg/donkasjo"
 
   return (
     <div className="relative min-h-screen px-4 py-12 lg:px-8">
