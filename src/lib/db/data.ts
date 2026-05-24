@@ -97,13 +97,18 @@ export async function getLeaderboard() {
     .limit(100)
     .lean()
     
-  return users.map((u, index) => ({
-    rank: index + 1,
-    kickUsername: u.kickUsername,
-    kickAvatar: u.kickAvatar || "",
-    points: u.points,
-    watchTimeMinutes: u.watchTimeMinutes,
-  }))
+  return users.map((user, index) => {
+    if (user.kickUsername === "BotRix") return null;
+
+    return {
+      rank: index + 1,
+      kickUsername: user.kickUsername,
+      kickAvatar: user.kickAvatar,
+      points: user.points,
+      watchTimeMinutes: user.watchTimeMinutes,
+    };
+  })
+  .filter(Boolean);
 }
 
 export async function getGlobalStats() {
