@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     template: "%s | Don Kasjo",
   },
   description:
-    "Oficjalna platforma streamingowa z systemem punktow, predykcjami i nagrodami. Ogladaj transmisje, zbieraj punkty i wymieniaj je na nagrody!",
+    "Oficjalna platforma streamingowa z systemem punktow, predykcjami i nagrodami. Ogladaj transmisje, zbieraj punkty i wymieniaj je na nagrody!!",
   icons: {
     icon: "/kasyno8.png",
     apple: "/kasyno8.png",
