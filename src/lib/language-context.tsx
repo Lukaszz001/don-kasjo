@@ -657,12 +657,7 @@ export function LanguageProvider({
     // On the client, we might want to override the server-provided language 
     // if the user has a different one saved in localStorage.
     // However, the Cookie sync in setLanguage should keep them aligned.
-    let saved: Language | null = null
-    try {
-      saved = localStorage.getItem("language") as Language
-    } catch (e) {
-      console.warn("localStorage is disabled or unavailable:", e)
-    }
+    const saved = localStorage.getItem("language") as Language
     if (saved && (saved === "pl" || saved === "en") && saved !== language) {
       setLanguageState(saved)
     }
@@ -671,14 +666,9 @@ export function LanguageProvider({
 
   const setLanguage = (lang: Language) => {
     setLanguageState(lang)
-    try {
-      localStorage.setItem("language", lang)
-    } catch (e) {
-      console.warn("Could not save language to localStorage:", e)
-    }
-    // Set a cookie so the server knows the choice for the next request.
-    const secure = window.location.protocol === "https:" ? ";secure" : ""
-    document.cookie = `NEXT_LOCALE=${lang};path=/;max-age=31536000;samesite=lax${secure}`
+    localStorage.setItem("language", lang)
+    // Set a cookie so the server knows the choice for the next request
+    document.cookie = `NEXT_LOCALE=${lang};path=/;max-age=31536000`
   }
 
   const t = useMemo(() => {

@@ -11,7 +11,8 @@ import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { AdminModal } from "@/components/admin/admin-modal"
 import { Label } from "@/components/ui/label"
-import { apiFetcher, apiRequest } from "@/lib/api-client"
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
 interface User {
   _id: string
@@ -25,7 +26,7 @@ interface User {
 }
 
 export default function AdminUsersPage() {
-  const { data, mutate } = useSWR<{ users: User[] }>("/api/admin/users", apiFetcher)
+  const { data, mutate } = useSWR<{ users: User[] }>("/api/admin/users", fetcher)
   const [search, setSearch] = useState("")
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [pointsToAdd, setPointsToAdd] = useState("")
@@ -39,7 +40,7 @@ export default function AdminUsersPage() {
   const handleToggleAdmin = async (user: User) => {
     setIsUpdating(true)
     try {
-      const response = await apiRequest(`/api/admin/users/${user._id}`, {
+      const response = await fetch(`/api/admin/users/${user._id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isAdmin: !user.isAdmin }),
@@ -63,7 +64,7 @@ export default function AdminUsersPage() {
 
     setIsUpdating(true)
     try {
-      const response = await apiRequest(`/api/admin/users/${selectedUser._id}`, {
+      const response = await fetch(`/api/admin/users/${selectedUser._id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ pointsToAdd: parseInt(pointsToAdd) }),

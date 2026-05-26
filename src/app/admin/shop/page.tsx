@@ -18,7 +18,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { AdminModal } from "@/components/admin/admin-modal"
-import { apiFetcher, apiRequest } from "@/lib/api-client"
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
 interface ShopItem {
   _id: string
@@ -33,7 +34,7 @@ interface ShopItem {
 export default function AdminShopPage() {
   const { data, mutate } = useSWR<{ items: ShopItem[] }>(
     "/api/admin/shop",
-    apiFetcher
+    fetcher
   )
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -56,7 +57,7 @@ export default function AdminShopPage() {
 
     setIsSubmitting(true)
     try {
-      const response = await apiRequest("/api/shop", {
+      const response = await fetch("/api/shop", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -83,7 +84,7 @@ export default function AdminShopPage() {
 
   const handleToggleActive = async (item: ShopItem) => {
     try {
-      const response = await apiRequest(`/api/admin/shop/${item._id}`, {
+      const response = await fetch(`/api/admin/shop/${item._id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isActive: !item.isActive }),
@@ -102,7 +103,7 @@ export default function AdminShopPage() {
     if (!confirm("Czy na pewno chcesz usunac ten przedmiot?")) return
 
     try {
-      const response = await apiRequest(`/api/admin/shop/${itemId}`, {
+      const response = await fetch(`/api/admin/shop/${itemId}`, {
         method: "DELETE",
       })
 

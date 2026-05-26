@@ -7,7 +7,8 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Button } from "@/components/ui/button"
 import { useLanguage } from "@/lib/language-context"
 import useSWR from "swr"
-import { apiFetcher } from "@/lib/api-client"
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
 interface Instruction {
   _id: string
@@ -17,15 +18,13 @@ interface Instruction {
   imageUrl: string
 }
 
-export function InstructionsList({ initialInstructions }: { initialInstructions: Instruction[] }) {
+export function InstructionsList({ initialInstructions }: { initialInstructions: any[] }) {
   const { t } = useLanguage()
-  const { data } = useSWR("/api/instructions", apiFetcher, { 
+  const { data } = useSWR("/api/instructions", fetcher, { 
     fallbackData: { instructions: initialInstructions },
-    revalidateOnFocus: true,
-    revalidateOnReconnect: true,
-    refreshInterval: () => document.visibilityState === "visible" ? 60000 : 0,
+    refreshInterval: 60000 
   })
-  const instructions: Instruction[] = data?.instructions || initialInstructions
+  const instructions = data?.instructions || initialInstructions
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 lg:px-8 relative">

@@ -27,10 +27,7 @@ const createMockRedis = () => ({
 })
 
 export const redis: Redis | ReturnType<typeof createMockRedis> = REDIS_URL 
-  ? (global.redis || new Redis(REDIS_URL, {
-      connectTimeout: 5000,
-      maxRetriesPerRequest: 1
-    }))
+  ? (global.redis || new Redis(REDIS_URL))
   : createMockRedis()
 
 if (process.env.NODE_ENV !== "production") {
@@ -45,7 +42,7 @@ export async function getSession(sessionId: string) {
 
 export async function setSession(
   sessionId: string,
-  data: unknown,
+  data: Record<string, unknown>,
   expiresInSeconds: number = 60 * 60 * 24 * 7 // 7 days
 ) {
   await redis.set(

@@ -30,7 +30,8 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { useLanguage } from "@/lib/language-context"
 import { toast } from "sonner"
-import { apiFetcher, apiRequest } from "@/lib/api-client"
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
 // Consistent number formatting to avoid hydration mismatches
 function formatNumber(num: number | undefined | null): string {
@@ -39,8 +40,8 @@ function formatNumber(num: number | undefined | null): string {
 }
 
 export default function ProfilePage() {
-  const { data: userData, isLoading, mutate } = useSWR("/api/auth/me", apiFetcher)
-  const { data: activitiesData } = useSWR("/api/user/activities", apiFetcher)
+  const { data: userData, isLoading, mutate } = useSWR("/api/auth/me", fetcher)
+  const { data: activitiesData } = useSWR("/api/user/activities", fetcher)
   const { t } = useLanguage()
   const user = userData?.user
   
@@ -56,7 +57,7 @@ export default function ProfilePage() {
 
     setIsVerifying(true)
     try {
-      const response = await apiRequest("/api/user/verify-stake", {
+      const response = await fetch("/api/user/verify-stake", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ stakeUsername }),

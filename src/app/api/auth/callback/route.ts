@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
   const state = searchParams.get("state")
   const error = searchParams.get("error")
 
-  const appUrl = (process.env.NEXT_PUBLIC_APP_URL || request.nextUrl.origin).replace(/\/$/, "")
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || ""
 
   if (error) {
     return NextResponse.redirect(`${appUrl}/?error=${error}`)
@@ -61,7 +61,6 @@ export async function GET(request: NextRequest) {
       kickUsername: user.kickUsername,
       kickAvatar: user.kickAvatar,
       isAdmin: user.isAdmin,
-      isDeveloper: user.isDeveloper || false,
       accessToken: tokens.access_token,
       refreshToken: tokens.refresh_token,
     })

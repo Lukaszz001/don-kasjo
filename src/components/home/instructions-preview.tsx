@@ -6,17 +6,14 @@ import { Card, CardContent } from "@/components/ui/card"
 import { useLanguage } from "@/lib/language-context"
 import useSWR from "swr"
 import { cn } from "@/lib/utils"
-import { apiFetcher } from "@/lib/api-client"
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
 const DEFAULT_ICONS = [BookOpen, Zap, Trophy, Sparkles, HelpCircle]
 
 export function InstructionsPreview() {
   const { t } = useLanguage()
-  const { data, isLoading } = useSWR("/api/instructions", apiFetcher, {
-    revalidateOnFocus: true,
-    revalidateOnReconnect: true,
-    refreshInterval: () => document.visibilityState === "visible" ? 60000 : 0,
-  })
+  const { data, isLoading } = useSWR("/api/instructions", fetcher, { refreshInterval: 60000 })
 
   const instructions = data?.instructions?.slice(0, 3) || []
 

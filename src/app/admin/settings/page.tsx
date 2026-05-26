@@ -1,7 +1,7 @@
 "use client"
 
 import useSWR from "swr"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { 
   Settings, 
   CheckCircle2, 
@@ -26,26 +26,27 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
-import { apiFetcher, apiRequest } from "@/lib/api-client"
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
 export default function AdminSettingsPage() {
   const router = useRouter()
-  const { data: userData } = useSWR("/api/auth/me", apiFetcher)
-  const { data: configData, mutate: mutateConfig, isLoading } = useSWR("/api/admin/config", apiFetcher)
+  const { data: userData } = useSWR("/api/auth/me", fetcher)
+  const { data: configData, mutate: mutateConfig, isLoading } = useSWR("/api/admin/config", fetcher)
   const [isSaving, setIsSaving] = useState<string | null>(null)
 
   const user = userData?.user
   
-  useEffect(() => {
-    if (!isLoading && user && !user.isDeveloper) {
-      router.push("/admin")
-    }
-  }, [isLoading, router, user])
+  // Security check
+  if (!isLoading && user && !user.isDeveloper) {
+    router.push("/admin")
+    return null
+  }
 
   const handleSaveConfig = async (key: string, value: string) => {
     setIsSaving(key)
     try {
-      const response = await apiRequest("/api/admin/config", {
+      const response = await fetch("/api/admin/config", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ key, value }),
@@ -59,10 +60,6 @@ export default function AdminSettingsPage() {
     } finally {
       setIsSaving(null)
     }
-  }
-
-  if (!isLoading && user && !user.isDeveloper) {
-    return null
   }
 
   const CONFIG_FIELDS = [

@@ -19,7 +19,8 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { cn } from "@/lib/utils"
-import { apiFetcher } from "@/lib/api-client"
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
 interface PurchaseLog {
   _id: string
@@ -35,7 +36,7 @@ interface PurchaseLog {
 }
 
 export default function AdminPurchasesPage() {
-  const { data, isLoading } = useSWR("/api/admin/purchases", apiFetcher)
+  const { data, isLoading } = useSWR("/api/admin/purchases", fetcher)
   const [searchQuery, setSearchQuery] = useState("")
 
   const purchases: PurchaseLog[] = data?.purchases || []

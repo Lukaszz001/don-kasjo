@@ -1,5 +1,4 @@
 import { getAppAccessToken } from "./auth/kick"
-import { serverFetch } from "@/lib/server-fetch"
 
 const KICK_API_BASE = "https://api.kick.com/public/v1"
 
@@ -21,7 +20,7 @@ export async function getEventsSubscriptions(broadcasterId?: number) {
     url.searchParams.append("broadcaster_user_id", broadcasterId.toString())
   }
 
-  const response = await serverFetch(url.toString(), {
+  const response = await fetch(url.toString(), {
     headers: {
       Authorization: `Bearer ${token}`,
       Accept: "application/json",
@@ -45,7 +44,7 @@ export async function subscribeToEvents(
 ) {
   const token = await getAppAccessToken()
 
-  const response = await serverFetch(`${KICK_API_BASE}/events/subscriptions`, {
+  const response = await fetch(`${KICK_API_BASE}/events/subscriptions`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -74,7 +73,7 @@ export async function deleteEventsSubscriptions(ids: string[]) {
   const url = new URL(`${KICK_API_BASE}/events/subscriptions`)
   ids.forEach(id => url.searchParams.append("id", id))
 
-  const response = await serverFetch(url.toString(), {
+  const response = await fetch(url.toString(), {
     method: "DELETE",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -92,7 +91,7 @@ export async function deleteEventsSubscriptions(ids: string[]) {
 
 export async function getChannelBySlug(slug: string) {
   const token = await getAppAccessToken()
-  const response = await serverFetch(
+  const response = await fetch(
     `${KICK_API_BASE}/channels?slug=${slug}`,
     {
       headers: {
@@ -149,7 +148,7 @@ export async function ensureKickSubscription() {
 }
 
 export async function getKickPublicKey() {
-  const response = await serverFetch(`${KICK_API_BASE}/public-key`, {
+  const response = await fetch(`${KICK_API_BASE}/public-key`, {
     headers: {
       Accept: "application/json",
     },

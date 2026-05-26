@@ -18,7 +18,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { apiFetcher, apiRequest } from "@/lib/api-client"
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
 interface Prediction {
   _id: string
@@ -38,7 +39,7 @@ interface Prediction {
 export default function AdminPredictionsPage() {
   const { data, mutate } = useSWR<{ predictions: Prediction[] }>(
     "/api/predictions",
-    apiFetcher
+    fetcher
   )
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [resolveDialog, setResolveDialog] = useState<Prediction | null>(null)
@@ -63,7 +64,7 @@ export default function AdminPredictionsPage() {
 
     setIsSubmitting(true)
     try {
-      const response = await apiRequest("/api/predictions", {
+      const response = await fetch("/api/predictions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -94,7 +95,7 @@ export default function AdminPredictionsPage() {
   const handleResolve = async (predictionId: string, winningOption: 1 | 2) => {
     setIsSubmitting(true)
     try {
-      const response = await apiRequest(`/api/predictions/${predictionId}/resolve`, {
+      const response = await fetch(`/api/predictions/${predictionId}/resolve`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ winningOption }),
@@ -115,7 +116,7 @@ export default function AdminPredictionsPage() {
   const handleRefund = async (predictionId: string) => {
     setIsSubmitting(true)
     try {
-      const response = await apiRequest(`/api/predictions/${predictionId}/resolve`, {
+      const response = await fetch(`/api/predictions/${predictionId}/resolve`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "refund" }),

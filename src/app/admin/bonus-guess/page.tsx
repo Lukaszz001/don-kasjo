@@ -11,7 +11,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { AdminModal } from "@/components/admin/admin-modal"
-import { apiFetcher, apiRequest } from "@/lib/api-client"
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
 type Currency = "USD" | "PLN" | "EUR"
 
@@ -53,9 +54,7 @@ const MEDAL: Record<number, { icon: string; ring: string; bg: string; text: stri
 // ─── Entries panel (leaderboard) ──────────────────────────────────────────────
 function EntriesPanel({ roundId, currency, result }: { roundId: string; currency: Currency; result: number | null }) {
   const { data } = useSWR<{ round: BonusRound; entries: Entry[] }>(
-    `/api/admin/bonus-guess/${roundId}`,
-    apiFetcher,
-    { refreshInterval: () => document.visibilityState === "visible" ? 3000 : 0 }
+    `/api/admin/bonus-guess/${roundId}`, fetcher, { refreshInterval: 3000 }
   )
   const entries = data?.entries || []
   const isResolved = result !== null
@@ -142,9 +141,7 @@ function EntriesPanel({ roundId, currency, result }: { roundId: string; currency
 // ─── Live entries count (for active round) ────────────────────────────────────
 function LiveCount({ roundId }: { roundId: string }) {
   const { data } = useSWR<{ entries: Entry[] }>(
-    `/api/admin/bonus-guess/${roundId}`,
-    apiFetcher,
-    { refreshInterval: () => document.visibilityState === "visible" ? 5000 : 0 }
+    `/api/admin/bonus-guess/${roundId}`, fetcher, { refreshInterval: 5000 }
   )
   const count = data?.entries?.length ?? 0
   return (
@@ -160,10 +157,8 @@ function LiveCount({ roundId }: { roundId: string }) {
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function AdminBonusGuessPage() {
-  const { data, mutate } = useSWR<{ rounds: BonusRound[] }>("/api/admin/bonus-guess", apiFetcher, {
-    revalidateOnFocus: true,
-    revalidateOnReconnect: true,
-    refreshInterval: () => document.visibilityState === "visible" ? 5000 : 0,
+  const { data, mutate } = useSWR<{ rounds: BonusRound[] }>("/api/admin/bonus-guess", fetcher, {
+    refreshInterval: 5000
   })
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [resolveDialog, setResolveDialog] = useState<BonusRound | null>(null)
@@ -180,7 +175,7 @@ export default function AdminBonusGuessPage() {
     if (!slotName.trim()) { toast.error("Wpisz nazwę slota"); return }
     setIsSubmitting(true)
     try {
-      const res = await apiRequest("/api/admin/bonus-guess", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ slotName: slotName.trim(), currency }) })
+      const res = await fetch("/api/admin/bonus-guess", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ slotName: slotName.trim(), currency }) })
       if (!res.ok) throw new Error()
       toast.success("Runda uruchomiona! Widzowie mogą teraz typować.")
       setIsCreateOpen(false); setSlotName(""); setCurrency("USD"); mutate()
@@ -191,7 +186,7 @@ export default function AdminBonusGuessPage() {
   const handleLock = async (id: string) => {
     setIsSubmitting(true)
     try {
-      const res = await apiRequest(`/api/admin/bonus-guess/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "lock" }) })
+      const res = await fetch(`/api/admin/bonus-guess/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "lock" }) })
       if (!res.ok) throw new Error()
       toast.success("Typowania zablokowane"); mutate()
     } catch { toast.error("Błąd blokowania") }
@@ -204,7 +199,7 @@ export default function AdminBonusGuessPage() {
     if (isNaN(num) || num <= 0) { toast.error("Wpisz prawidłowy wynik"); return }
     setIsSubmitting(true)
     try {
-      const res = await apiRequest(`/api/admin/bonus-guess/${resolveDialog._id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "resolve", result: num }) })
+      const res = await fetch(`/api/admin/bonus-guess/${resolveDialog._id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "resolve", result: num }) })
       if (!res.ok) throw new Error()
       toast.success("Runda rozwiązana!")
       setResolveDialog(null); setResultInput(""); mutate()
@@ -216,7 +211,7 @@ export default function AdminBonusGuessPage() {
     if (!confirm("Czy na pewno chcesz usunąć tę rundę?")) return
     setIsSubmitting(true)
     try {
-      const res = await apiRequest(`/api/admin/bonus-guess/${id}`, { method: "DELETE" })
+      const res = await fetch(`/api/admin/bonus-guess/${id}`, { method: "DELETE" })
       if (!res.ok) throw new Error()
       toast.success("Runda usunięta")
       mutate()

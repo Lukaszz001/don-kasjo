@@ -13,7 +13,6 @@ export interface SessionData {
   kickUsername: string
   kickAvatar: string
   isAdmin: boolean
-  isDeveloper?: boolean
   accessToken: string
   refreshToken: string
 }
@@ -21,13 +20,12 @@ export interface SessionData {
 export async function createSession(data: SessionData): Promise<string> {
   const sessionId = nanoid(32)
   await setSession(sessionId, data, SESSION_EXPIRY)
-  const crossSiteAuth = process.env.AUTH_CROSS_SITE === "true"
 
   const cookieStore = await cookies()
   cookieStore.set(SESSION_COOKIE_NAME, sessionId, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production" || crossSiteAuth,
-    sameSite: crossSiteAuth ? "none" : "lax",
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     maxAge: SESSION_EXPIRY,
     path: "/",
   })
