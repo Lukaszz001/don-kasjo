@@ -24,6 +24,7 @@ import {
   ArrowLeft,
   Target,
   Dices,
+  Flag,
 } from "lucide-react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
@@ -60,6 +61,7 @@ export function SidebarNav({ initialUser }: { initialUser?: any }) {
     { name: t("nav.predictions"), href: "/predictions", icon: TrendingUp },
     { name: t("nav.shop"), href: "/shop", icon: ShoppingBag },
     { name: t("nav.leaderboard"), href: "/leaderboard", icon: Trophy },
+    { name: "Wager Race", href: "/wager-race", icon: Flag },
     { name: t("nav.instructions"), href: "/instructions", icon: BookOpen },
     { name: t("nav.bonusHunt"), href: "/bonus-hunt", icon: Target },
     { name: t("nav.discord"), href: "/discord", icon: DiscordIcon },
