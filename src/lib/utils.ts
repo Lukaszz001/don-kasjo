@@ -17,3 +17,7 @@ export function formatPoints(points?: number) {
   if (points >= 1000) return (points / 1000).toFixed(1) + "K"
   return points.toLocaleString()
 }
+export function maskUsername(username: string) {
+  if (username.length <= 4) return username;
+  return username.substring(0, 2) + "****" + username.substring(username.length - 2);
+}
