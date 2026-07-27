@@ -16,7 +16,7 @@ export function WagerRaceContent() {
     <div className="mx-auto max-w-4xl py-6 md:py-12 px-2 md:px-6">
       <h1 className="text-3xl md:text-4xl font-black text-white italic mb-8 uppercase flex items-center gap-3">
         <Flag className="w-8 h-8 text-green-500" />
-        <span><span style={{ color: "#22c55e" }}>STAKE</span> WAGER RACE (23.07.2026)</span>
+        <span><span style={{ color: "#22c55e" }}>STAKE</span> WAGER RACE (27.07.2026)</span>
       </h1>
       <Card className="bg-[#0a0a0a]/40 border-white/10 backdrop-blur-md">
         <CardContent className="p-2 md:p-6">
