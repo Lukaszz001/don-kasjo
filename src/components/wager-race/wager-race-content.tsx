@@ -6,9 +6,9 @@ import { maskUsername } from "@/lib/utils"
 import { Flag } from "lucide-react"
 
 const rewards: { [key: string]: string } = {
-  "1": "3500 PLN", "2": "1500 PLN", "3": "1000 PLN", "4": "500 PLN",
-  "5": "400 PLN", "6": "300 PLN", "7": "200 PLN", "8": "150 PLN",
-  "9": "100 PLN", "10": "100 PLN"
+  "1": "915 USD", "2": "380 USD", "3": "260 USD", "4": "125 USD",
+  "5": "100 USD", "6": "80 USD", "7": "55 USD", "8": "40 USD",
+  "9": "25 USD", "10": "25 USD"
 }
 
 export function WagerRaceContent() {
