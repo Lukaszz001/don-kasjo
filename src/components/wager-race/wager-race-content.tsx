@@ -6,8 +6,8 @@ import { maskUsername } from "@/lib/utils"
 import { Flag } from "lucide-react"
 
 const rewards: { [key: string]: string } = {
-  "1": "1100 USD",
-  "2": "480 USD",
+  "1": "5500 USD",
+  "2": "1100 USD",
   "3": "300 USD",
   "4": "150 USD",
   "5": "100 USD",
@@ -34,7 +34,7 @@ export function WagerRaceContent() {
       <h1 className="text-3xl md:text-4xl font-black text-white italic mb-8 uppercase flex items-center gap-3">
         <Flag className="w-8 h-8 text-green-500" />
         <span>
-          <span style={{ color: "#22c55e" }}>STAKE</span> WAGER RACE WRZESIEŃ (11.09.2026, 23:59:59)
+          <span style={{ color: "#22c55e" }}>STAKE</span> WAGER RACE WRZESIEŃ (12.09.2026, 23:59:59)
         </span>
       </h1>
 
