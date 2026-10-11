@@ -6,27 +6,28 @@ import { maskUsername } from "@/lib/utils"
 import { Flag } from "lucide-react"
 
 const rewards: { [key: string]: string } = {
-  "1": "5500 USD",
+  "1": "3100 USD",
   "2": "1100 USD",
-  "3": "300 USD",
-  "4": "150 USD",
+  "3": "550 USD",
+  "4": "250 USD",
   "5": "100 USD",
   "6": "100 USD",
   "7": "100 USD",
-  "8": "60 USD",
-  "9": "50 USD",
-  "10": "50 USD",
-  "11": "45 USD",
-  "12": "40 USD",
-  "13": "40 USD",
-  "14": "40 USD",
-  "15": "40 USD",
-  "16": "30 USD",
-  "17": "30 USD",
+  "8": "100 USD",
+  "9": "100 USD",
+  "10": "101 USD",
+  "11": "70 USD",
+  "12": "70 USD",
+  "13": "70 USD",
+  "14": "50 USD",
+  "15": "50 USD",
+  "16": "50 USD",
+  "17": "50 USD",
   "18": "30 USD",
   "19": "30 USD",
   "20": "30 USD",
-}
+  "21": "101 USD",
+};
 
 export function WagerRaceContent() {
   return (
@@ -34,7 +35,7 @@ export function WagerRaceContent() {
       <h1 className="text-3xl md:text-4xl font-black text-white italic mb-8 uppercase flex items-center gap-3">
         <Flag className="w-8 h-8 text-green-500" />
         <span>
-          <span style={{ color: "#22c55e" }}>STAKE</span> WAGER RACE WRZESIEŃ (26.09.2026, 23:59:59)
+          <span style={{ color: "#22c55e" }}>STAKE</span> WAGER RACE PAŹDZIERNIK (11.10.2026)
         </span>
       </h1>
 
