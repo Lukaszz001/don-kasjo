@@ -1,102 +1,102 @@
 export const wagerRaceData = [
-  { position: "1", username: "mikron1337", wager: "$195,913.85" },
-  { position: "2", username: "Neversayneverj", wager: "$163,730.63" },
-  { position: "3", username: "Patrycjastake", wager: "$129,772.46" },
-  { position: "4", username: "Nikson201", wager: "$52,292.53" },
-  { position: "5", username: "Lysinek82629", wager: "$39,252.75" },
-  { position: "6", username: "Sergiejxdd", wager: "$32,439.09" },
-  { position: "7", username: "StM99", wager: "$24,692.66" },
-  { position: "8", username: "pysiawercia", wager: "$21,721.53" },
-  { position: "9", username: "Lukix333", wager: "$21,331.28" },
-  { position: "10", username: "Kaczuszka99", wager: "$18,356.26" },
-  { position: "11", username: "Lajgota", wager: "$11,492.75" },
-  { position: "12", username: "frupsulka", wager: "$11,061.52" },
-  { position: "13", username: "ambrozy80", wager: "$10,413.03" },
-  { position: "14", username: "Malin19164198", wager: "$10,091.65" },
-  { position: "15", username: "nattyso", wager: "$9,947.72" },
-  { position: "16", username: "dudek2121", wager: "$9,175.68" },
-  { position: "17", username: "venox007", wager: "$9,101.35" },
-  { position: "18", username: "Dieselek20", wager: "$9,011.35" },
-  { position: "19", username: "aveNgda", wager: "$8,877.53" },
-  { position: "20", username: "osatokrol", wager: "$8,242.94" },
-  { position: "21", username: "Pati555", wager: "$7,170.47" },
-  { position: "22", username: "Blazej725", wager: "$7,142.55" },
-  { position: "23", username: "Labomba93", wager: "$6,792.37" },
-  { position: "24", username: "Kotszef", wager: "$6,571.75" },
-  { position: "25", username: "anakonda9", wager: "$6,066.55" },
-  { position: "26", username: "Vernixxfq", wager: "$5,898.01" },
-  { position: "27", username: "varnixoo", wager: "$5,859.53" },
-  { position: "28", username: "Spel47", wager: "$5,471.55" },
-  { position: "29", username: "m0rdas", wager: "$5,339.27" },
-  { position: "30", username: "patryczekszew", wager: "$5,165.75" },
-  { position: "31", username: "rybaxd123", wager: "$5,134.56" },
-  { position: "32", username: "Klaaudynka4", wager: "$5,064.32" },
-  { position: "33", username: "Maniekmachna", wager: "$4,953.96" },
-  { position: "34", username: "Szymberg", wager: "$4,703.49" },
-  { position: "35", username: "Stefkaa1993", wager: "$4,517.14" },
-  { position: "36", username: "Karolek4200", wager: "$4,387.06" },
-  { position: "37", username: "cieniu11", wager: "$4,308.64" },
-  { position: "38", username: "GR3G0R996", wager: "$4,261.29" },
-  { position: "39", username: "wojtas2011", wager: "$4,140.53" },
-  { position: "40", username: "Jordrian", wager: "$4,091.87" },
-  { position: "41", username: "N5ive", wager: "$3,939.82" },
-  { position: "42", username: "bberni1234", wager: "$3,704.20" },
-  { position: "43", username: "wochuuu", wager: "$3,657.38" },
-  { position: "44", username: "spacekrul", wager: "$3,596.10" },
-  { position: "45", username: "zboro734", wager: "$3,389.92" },
-  { position: "46", username: "Jaro94", wager: "$3,204.01" },
-  { position: "47", username: "eziggg", wager: "$3,121.72" },
-  { position: "48", username: "Bartolomeo1904", wager: "$2,408.51" },
-  { position: "49", username: "Kamyk24323555", wager: "$2,384.22" },
-  { position: "50", username: "Matul05", wager: "$2,310.85" },
-  { position: "51", username: "Matriz889", wager: "$2,300.99" },
-  { position: "52", username: "Bedek7", wager: "$2,201.97" },
-  { position: "53", username: "olasawicka2", wager: "$2,101.56" },
-  { position: "54", username: "DawajMilion", wager: "$1,856.83" },
-  { position: "55", username: "Zakolak93", wager: "$1,792.03" },
-  { position: "56", username: "Kamyczekk1986", wager: "$1,760.47" },
-  { position: "57", username: "Nikos06x", wager: "$1,724.26" },
-  { position: "58", username: "yvxzii69", wager: "$1,638.64" },
-  { position: "59", username: "TwojaModelka", wager: "$1,592.25" },
-  { position: "60", username: "Martyna6767", wager: "$1,526.04" },
-  { position: "61", username: "karolpk", wager: "$1,442.41" },
-  { position: "62", username: "Macias21372137", wager: "$1,440.03" },
-  { position: "63", username: "Dionizossa", wager: "$1,350.49" },
-  { position: "64", username: "Matiox658", wager: "$1,329.59" },
-  { position: "65", username: "Sandra2711", wager: "$1,271.05" },
-  { position: "66", username: "NatrixNatrix", wager: "$1,240.38" },
-  { position: "67", username: "KrzosuMTS", wager: "$1,234.86" },
-  { position: "68", username: "btm223", wager: "$1,215.60" },
-  { position: "69", username: "Aras191", wager: "$1,214.05" },
-  { position: "70", username: "Nati211", wager: "$1,118.45" },
-  { position: "71", username: "Dybo87", wager: "$1,115.22" },
-  { position: "72", username: "ravter1993", wager: "$1,071.28" },
-  { position: "73", username: "tikooss123", wager: "$1,062.96" },
-  { position: "74", username: "Robson9418", wager: "$1,050.04" },
-  { position: "75", username: "alaweiso", wager: "$1,011.82" },
-  { position: "76", username: "Kacqer", wager: "$1,005.66" },
-  { position: "77", username: "Lew115", wager: "$960.73" },
-  { position: "78", username: "ziemi6", wager: "$957.05" },
-  { position: "79", username: "yorka1991", wager: "$928.35" },
-  { position: "80", username: "Toriblack988", wager: "$893.91" },
-  { position: "81", username: "Sonczi09", wager: "$854.97" },
-  { position: "82", username: "bakajoko", wager: "$840.95" },
-  { position: "83", username: "Maszek95", wager: "$784.78" },
-  { position: "84", username: "ThinMoon", wager: "$760.89" },
-  { position: "85", username: "trewk0", wager: "$717.37" },
-  { position: "86", username: "skibidi6767677", wager: "$678.59" },
-  { position: "87", username: "GobLEAN780", wager: "$638.99" },
-  { position: "88", username: "Stando91", wager: "$569.31" },
-  { position: "89", username: "Gaceek", wager: "$558.10" },
-  { position: "90", username: "Highlander91", wager: "$553.58" },
-  { position: "91", username: "PabloElCzepec", wager: "$545.09" },
-  { position: "92", username: "swagvictimm", wager: "$544.12" },
-  { position: "93", username: "Czerwonylis", wager: "$529.33" },
-  { position: "94", username: "majhelek", wager: "$514.48" },
-  { position: "95", username: "Piotrek1996", wager: "$508.44" },
-  { position: "96", username: "reznpz", wager: "$501.56" },
-  { position: "97", username: "amor008", wager: "$501.24" },
-  { position: "98", username: "sikora34", wager: "$499.60" },
-  { position: "99", username: "Ronaldek99", wager: "$458.92" },
-  { position: "100", username: "dudekkk777", wager: "$442.53" },
+  { position: "1", username: "mikron1337", wager: "$196,519.32" },[cite: 8]
+  { position: "2", username: "Neversayneverj", wager: "$168,122.21" },[cite: 8]
+  { position: "3", username: "Patrycjastake", wager: "$157,641.59" },[cite: 8]
+  { position: "4", username: "Nikson201", wager: "$53,524.58" },[cite: 8]
+  { position: "5", username: "Lysinek82629", wager: "$41,813.42" },[cite: 8]
+  { position: "6", username: "Sergiejxdd", wager: "$32,488.56" },[cite: 8]
+  { position: "7", username: "StM99", wager: "$24,860.31" },[cite: 8]
+  { position: "8", username: "pysiawercia", wager: "$22,144.28" },[cite: 8]
+  { position: "9", username: "Lukix333", wager: "$21,445.76" },[cite: 8]
+  { position: "10", username: "Kaczuszka99", wager: "$19,984.68" },[cite: 8]
+  { position: "11", username: "frupsulka", wager: "$12,227.24" },[cite: 8]
+  { position: "12", username: "Lajgota", wager: "$11,492.75" },[cite: 8]
+  { position: "13", username: "nattyso", wager: "$11,213.13" },[cite: 8]
+  { position: "14", username: "ambrozy80", wager: "$10,859.10" },[cite: 8]
+  { position: "15", username: "Malin19164198", wager: "$10,093.15" },[cite: 8]
+  { position: "16", username: "Dieselek20", wager: "$9,440.44" },[cite: 8]
+  { position: "17", username: "osatokrol", wager: "$9,292.69" },[cite: 8]
+  { position: "18", username: "dudek2121", wager: "$9,179.79" },[cite: 8]
+  { position: "19", username: "venox007", wager: "$9,101.35" },[cite: 8]
+  { position: "20", username: "aveNgda", wager: "$8,891.22" },[cite: 8]
+  { position: "21", username: "Pati555", wager: "$7,246.20" },[cite: 8]
+  { position: "22", username: "Blazej725", wager: "$7,165.72" },[cite: 8]
+  { position: "23", username: "Labomba93", wager: "$6,792.37" },[cite: 8]
+  { position: "24", username: "Kotszef", wager: "$6,683.90" },[cite: 8]
+  { position: "25", username: "anakonda9", wager: "$6,541.95" },[cite: 8]
+  { position: "26", username: "rybaxd123", wager: "$6,263.52" },[cite: 8]
+  { position: "27", username: "Karolek4200", wager: "$6,187.53" },[cite: 8]
+  { position: "28", username: "varnixoo", wager: "$6,098.62" },[cite: 8]
+  { position: "29", username: "Vernixxfq", wager: "$5,935.28" },[cite: 8]
+  { position: "30", username: "patryczekszew", wager: "$5,923.20" },[cite: 8]
+  { position: "31", username: "Spel47", wager: "$5,472.97" },[cite: 8]
+  { position: "32", username: "m0rdas", wager: "$5,343.57" },[cite: 8]
+  { position: "33", username: "Klaaudynka4", wager: "$5,073.52" },[cite: 8]
+  { position: "34", username: "Maniekmachna", wager: "$4,975.08" },[cite: 8]
+  { position: "35", username: "Szymberg", wager: "$4,704.03" },[cite: 8]
+  { position: "36", username: "Stefkaa1993", wager: "$4,612.72" },[cite: 8]
+  { position: "37", username: "cieniu11", wager: "$4,308.64" },[cite: 8]
+  { position: "38", username: "Jordrian", wager: "$4,294.68" },[cite: 8]
+  { position: "39", username: "GR3G0R996", wager: "$4,283.74" },[cite: 8]
+  { position: "40", username: "wojtas2011", wager: "$4,144.51" },[cite: 8]
+  { position: "41", username: "N5ive", wager: "$3,955.93" },[cite: 8]
+  { position: "42", username: "wochuuu", wager: "$3,831.65" },[cite: 8]
+  { position: "43", username: "bberni1234", wager: "$3,755.60" },[cite: 8]
+  { position: "44", username: "spacekrul", wager: "$3,607.76" },[cite: 8]
+  { position: "45", username: "zboro734", wager: "$3,396.15" },[cite: 8]
+  { position: "46", username: "KrzosuMTS", wager: "$3,246.61" },[cite: 8]
+  { position: "47", username: "Jaro94", wager: "$3,237.06" },[cite: 8]
+  { position: "48", username: "eziggg", wager: "$3,122.97" },[cite: 8]
+  { position: "49", username: "Matul05", wager: "$2,545.90" },[cite: 8]
+  { position: "50", username: "Matriz889", wager: "$2,526.65" },[cite: 8]
+  { position: "51", username: "Bartolomeo1904", wager: "$2,408.51" },[cite: 8]
+  { position: "52", username: "Kamyk24323555", wager: "$2,404.77" },[cite: 8]
+  { position: "53", username: "Bedek7", wager: "$2,201.97" },[cite: 8]
+  { position: "54", username: "TwojaModelka", wager: "$2,143.70" },[cite: 8]
+  { position: "55", username: "olasawicka2", wager: "$2,105.05" },[cite: 8]
+  { position: "56", username: "karolpk", wager: "$1,882.25" },[cite: 8]
+  { position: "57", username: "DawajMilion", wager: "$1,860.46" },[cite: 8]
+  { position: "58", username: "Zakolak93", wager: "$1,800.18" },[cite: 8]
+  { position: "59", username: "Kamyczekk1986", wager: "$1,763.47" },[cite: 8]
+  { position: "60", username: "Macias21372137", wager: "$1,756.14" },[cite: 8]
+  { position: "61", username: "Nikos06x", wager: "$1,724.26" },[cite: 8]
+  { position: "62", username: "yvxzii69", wager: "$1,639.00" },[cite: 8]
+  { position: "63", username: "Sandra2711", wager: "$1,564.06" },[cite: 8]
+  { position: "64", username: "Martyna6767", wager: "$1,526.04" },[cite: 8]
+  { position: "65", username: "Dionizossa", wager: "$1,352.82" },[cite: 8]
+  { position: "66", username: "Matiox658", wager: "$1,330.59" },[cite: 8]
+  { position: "67", username: "Aras191", wager: "$1,270.17" },[cite: 8]
+  { position: "68", username: "NatrixNatrix", wager: "$1,240.38" },[cite: 8]
+  { position: "69", username: "btm223", wager: "$1,215.60" },[cite: 8]
+  { position: "70", username: "Stando91", wager: "$1,177.14" },[cite: 8]
+  { position: "71", username: "Kubanoo", wager: "$1,176.03" },[cite: 8]
+  { position: "72", username: "Nati211", wager: "$1,128.92" },[cite: 8]
+  { position: "73", username: "Dybo87", wager: "$1,117.14" },[cite: 8]
+  { position: "74", username: "grejbukson", wager: "$1,115.05" },[cite: 8]
+  { position: "75", username: "ravter1993", wager: "$1,073.40" },[cite: 8]
+  { position: "76", username: "tikooss123", wager: "$1,064.38" },[cite: 8]
+  { position: "77", username: "Robson9418", wager: "$1,062.07" },[cite: 8]
+  { position: "78", username: "ziemi6", wager: "$1,042.67" },[cite: 8]
+  { position: "79", username: "Toriblack988", wager: "$1,021.27" },[cite: 8]
+  { position: "80", username: "alaweiso", wager: "$1,011.82" },[cite: 8]
+  { position: "81", username: "Kacqer", wager: "$1,005.66" },[cite: 8]
+  { position: "82", username: "Lew115", wager: "$960.73" },[cite: 8]
+  { position: "83", username: "yorka1991", wager: "$949.62" },[cite: 8]
+  { position: "84", username: "bakajoko", wager: "$860.92" },[cite: 8]
+  { position: "85", username: "Sonczi09", wager: "$854.97" },[cite: 8]
+  { position: "86", username: "Åukasz1996", wager: "$850.80" },[cite: 8]
+  { position: "87", username: "Maszek95", wager: "$784.78" },[cite: 8]
+  { position: "88", username: "ThinMoon", wager: "$760.89" },[cite: 8]
+  { position: "89", username: "trewk0", wager: "$727.67" },[cite: 8]
+  { position: "90", username: "skibidi6767677", wager: "$678.59" },[cite: 8]
+  { position: "91", username: "GobLEAN780", wager: "$638.99" },[cite: 8]
+  { position: "92", username: "Czerwonylis", wager: "$617.54" },[cite: 8]
+  { position: "93", username: "PabloElCzepec", wager: "$559.33" },[cite: 8]
+  { position: "94", username: "Gaceek", wager: "$558.10" },[cite: 8]
+  { position: "95", username: "Highlander91", wager: "$553.58" },[cite: 8]
+  { position: "96", username: "swagvictimm", wager: "$545.23" },[cite: 8]
+  { position: "97", username: "skowyrion", wager: "$541.54" },[cite: 8]
+  { position: "98", username: "reznpz", wager: "$532.76" },[cite: 8]
+  { position: "99", username: "majhelek", wager: "$514.48" },[cite: 8]
+  { position: "100", username: "Piotrek1996", wager: "$508.44" },[cite: 8]
 ];
