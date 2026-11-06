@@ -6,12 +6,12 @@ import { maskUsername } from "@/lib/utils"
 import { Flag } from "lucide-react"
 
 const rewards: { [key: string]: string } = {
-  "1": "3100 USD",
+  "1": "4150 USD",
   "2": "1100 USD",
-  "3": "550 USD",
-  "4": "250 USD",
-  "5": "100 USD",
-  "6": "100 USD",
+  "3": "600 USD",
+  "4": "400 USD",
+  "5": "250 USD",
+  "6": "150 USD",
   "7": "100 USD",
   "8": "100 USD",
   "9": "100 USD",
